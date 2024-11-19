@@ -21,17 +21,20 @@
     "@electron-forge/plugin-fuses": "^7.5.0",
     "@electron-forge/plugin-vite": "^7.5.0",
     "@electron/fuses": "^1.8.0",
+    "@types/qs": "^6.9.17",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.0.0",
-    "eslint": "^8.0.1",
-    "eslint-plugin-import": "^2.25.0",
+    "cheerio": "^1.0.0",
     "electron": "^33.2.0",
     "electron-builder": "^25.1.8",
+    "eslint": "^8.0.1",
+    "eslint-plugin-import": "^2.25.0",
+    "tesseract.js": "^5.1.1",
     "ts-node": "^10.0.0",
     "typescript": "~4.5.4",
-    "vite": "^5.0.12",
-    "cheerio": "^1.0.0",
-    "tesseract.js": "^5.1.1"
+    "vite": "^5.0.12"
   },
   "keywords": [],
   "author": {
@@ -41,8 +44,12 @@
   "license": "MIT",
   "dependencies": {
     "@ant-design/icons": "^5.5.1",
+    "@emotion/react": "^11.13.3",
+    "@emotion/styled": "^11.13.0",
     "antd": "^5.22.1",
     "axios": "^1.7.7",
-    "electron-squirrel-startup": "^1.0.1"
+    "electron-squirrel-startup": "^1.0.1",
+    "qs": "^6.13.1",
+    "react": "^18.3.1"
   }
 }
