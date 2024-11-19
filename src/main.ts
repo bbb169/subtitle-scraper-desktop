@@ -11,53 +11,52 @@ if (require('electron-squirrel-startup')) {
 
 const createWindow = async () => {
   try {
-    // 发起 HTTP 请求
-    const all = await axios.request({
-      maxRedirects: 5,
-      url: 'http://so.zimuku.org/search',
-      method: 'GET',
-      params: {
-        q: '金刚狼',
-        chost: 'zimuku.org',
-      },
-      validateStatus: function () {
-        // 返回 true 表示所有状态码都被视为有效
-        return true;
-      },
-    });
-    console.log('data: ', all.status, all.data);
+    // // 发起 HTTP 请求
+    // const all = await axios.request({
+    //   maxRedirects: 5,
+    //   url: 'http://so.zimuku.org/search',
+    //   method: 'GET',
+    //   params: {
+    //     q: '金刚狼',
+    //     chost: 'zimuku.org',
+    //   },
+    //   validateStatus: function () {
+    //     // 返回 true 表示所有状态码都被视为有效
+    //     return true;
+    //   },
+    // });
+    // // console.log('data: ', all.status, all.data);
 
-    // recognize()
-    // 使用 Cheerio 加载 data
-    const $ = cheerio.load(all.data);
+    // // recognize()
+    // // 使用 Cheerio 加载 data
+    // const $ = cheerio.load(all.data);
+    // console.log('$: ');
 
-    // 定义一个结果数组来存储解析的字幕信息
-    const subtitles: any[] = [];
+    // // 定义一个结果数组来存储解析的字幕信息
+    // const subtitles: any[] = [];
 
-    // 假设字幕信息在某些特定的 HTML 元素中
-    $('.verifyimg').each(async (index, element) => {
-      const imgSrc = $(element).attr('src'); // 获取图片路径
-      try {
-        // 获取图片数据
-        const response = await axios.get(imgSrc, {
-          responseType: 'arraybuffer',
-        });
-        const imageBuffer = Buffer.from(response.data, 'binary');
+    // // 假设字幕信息在某些特定的 HTML 元素中
+    // $('.verifyimg').each((index, element) => {
+    //   const imgSrc = $(element).attr('src'); // 获取图片路径
+    //   console.log('imgSrc: ', imgSrc);
+    //   try {
+    //     const imageBuffer = Buffer.from(imgSrc, 'base64');
 
-        // 调用 Tesseract.js 进行识别
-        recognize(imageBuffer, 'eng')
-          .then(({ data: { text } }) => {
-            console.log(`验证码 ${index}: ${text.trim()}`);
-          })
-          .catch((error) => {
-            console.error(`验证码 ${index} 识别失败:`, error);
-          });
-      } catch (error) {
-        console.error(`获取验证码图片失败 (${imgSrc}):`, error);
-      }
-    });
+    //       // 调用 Tesseract.js 进行识别
+    //       recognize(imageBuffer, '')
+    //         .then(({ data: { text } }) => {
+    //           console.log(`验证码 ${index}: ${text.trim()}`);
+    //         })
+    //         .catch((error) => {
+    //           console.error(`验证码 ${index} 识别失败:`, error);
+    //         });
+    //     return !!subtitles
+    //   } catch (error) {
+    //     console.error(`获取验证码图片失败 (${imgSrc}):`, error);
+    //   }
+    // });
 
-    return subtitles;
+    // return subtitles;
   } catch (error) {
     console.log('error: ', error);
     

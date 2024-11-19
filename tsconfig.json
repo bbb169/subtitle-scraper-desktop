@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "jsx": "react-jsx",
     "target": "ESNext",
     "module": "commonjs",
     "allowJs": true,
@@ -10,6 +11,8 @@
     "baseUrl": ".",
     "outDir": "dist",
     "moduleResolution": "node",
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "jsxImportSource": "@emotion/react",
+    "types": ["@emotion/react/types/css-prop"]
   }
 }
