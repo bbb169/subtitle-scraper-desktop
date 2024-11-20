@@ -7,7 +7,7 @@ export default function () {
 
   return <div>
     <div>2132</div>
-    <SubtitleSiteRender src={`http://so.zimuku.org/search?${stringify({
+    <SubtitleSiteRender src={`https://so.zimuku.org/search?${stringify({
       q: '金刚狼',
       chost: 'zimuku.org',
     })}`}/>
