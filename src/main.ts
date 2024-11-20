@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, session } from 'electron';
 import path from 'path';
 import * as cheerio from 'cheerio';
 import { recognize } from 'tesseract.js';
@@ -10,6 +10,10 @@ if (require('electron-squirrel-startup')) {
 }
 
 const createWindow = async () => {
+  session.defaultSession.setCertificateVerifyProc((request, callback) => {
+    // 忽略所有证书验证错误
+    callback(0);
+  });
   try {
     // // 发起 HTTP 请求
     // const all = await axios.request({
@@ -64,10 +68,15 @@ const createWindow = async () => {
 
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1400,
+    height: 900,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
+      nodeIntegration: true, // 如果需要 Node.js 支持
+      contextIsolation: false, // 如果需要共享上下文
+      webSecurity: false, // 禁用同源策略
+      allowRunningInsecureContent: true,
+      webviewTag: true, // 启用 webview
     },
   });
 
