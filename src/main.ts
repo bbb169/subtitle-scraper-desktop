@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { app, BrowserWindow, session } from 'electron';
+import { app, BrowserWindow, ipcMain, session } from 'electron';
 import path from 'path';
 import * as cheerio from 'cheerio';
 import { recognize } from 'tesseract.js';
@@ -61,6 +61,24 @@ const createWindow = async () => {
     // });
 
     // return subtitles;
+    ipcMain.handle("recognizeVerifyNumber", async (_, imgBase64: string) => {
+      const imageBuffer = Buffer.from(imgBase64, "base64");
+      const rootPath = path.resolve(__dirname, "./assets");
+      console.log('rootPath: ', rootPath);
+
+      try {
+        const { data: { text } } = await recognize(imageBuffer, "chi_sim", {
+          langPath: rootPath,
+          gzip: false,
+          dataPath: "chi_sim.traineddata",
+        })
+        console.log(`验证码 : ${text.trim()}`);
+        return text.trim()
+      } catch (error) {
+        console.error(`验证码  识别失败:`, error);
+        return null
+      }
+    });
   } catch (error) {
     console.log('error: ', error);
     
