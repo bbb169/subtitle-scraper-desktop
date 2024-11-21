@@ -31,6 +31,7 @@
     "electron-builder": "^25.1.8",
     "eslint": "^8.0.1",
     "eslint-plugin-import": "^2.25.0",
+    "rollup-plugin-copy": "^3.5.0",
     "tesseract.js": "^5.1.1",
     "ts-node": "^10.0.0",
     "typescript": "~4.5.4",
@@ -44,6 +45,7 @@
   "license": "MIT",
   "dependencies": {
     "@ant-design/icons": "^5.5.1",
+    "@electron-toolkit/preload": "^3.0.1",
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
     "antd": "^5.22.1",
