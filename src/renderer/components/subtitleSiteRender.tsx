@@ -35,6 +35,35 @@ export default forwardRef(function (
           recognize(imageBuffer, "eng")
             .then(({ data: { text } }) => {
               console.log(`验证码 : ${text.trim()}`);
+
+              (subtitleSiteDom as any)
+                .executeJavaScript(
+                  `
+                (function() {
+                  // 获取输入框 DOM 元素
+                  const inputElement = document.querySelector("#intext");
+
+                  // 填入数字
+                  inputElement.value = "${text.trim()}";
+
+                  setTimeout(() => {
+                    // 创建一个键盘事件，模拟按下 Enter 键
+                    const enterEvent = new KeyboardEvent("keypress", {
+                      bubbles: true,
+                      cancelable: true,
+                      key: "Enter",
+                      code: "Enter",
+                      keyCode: 13, // 兼容性处理
+                      which: 13,   // 兼容性处理
+                    });
+
+                    // 派发键盘事件到输入框
+                    document.body.dispatchEvent(enterEvent);
+                  }, 2000);
+
+                })();
+              `
+                )
             })
             .catch((error) => {
               console.error(`验证码  识别失败:`, error);
