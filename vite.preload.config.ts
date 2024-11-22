@@ -9,7 +9,7 @@ export default defineConfig(() => {
       copy({
         targets: [
           {
-            src: 'src/assets/chi_sim.traineddata', // 源文件路径
+            src: 'src/assets/*', // 源文件路径
             dest: `${outputDir}/assets`, // 输出目录
           },
         ],
