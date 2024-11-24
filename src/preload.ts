@@ -5,8 +5,8 @@ import { PreloadAPITypes } from './type';
 
 // Custom APIs for renderer
 const api: PreloadAPITypes = {
-  async recognizeVerifyNumber(html: string) {
-    return await ipcRenderer.invoke('recognizeVerifyNumber', html)
+  async openUploadDialog() {
+    return await ipcRenderer.invoke('openUploadDialog')
   },
 }
 
