@@ -18,64 +18,73 @@ const domNavigateing = (subtitleSiteDom: HTMLWebViewElement) => {
     let navigated = false;
 
     const didiNavigateListener = () => {
-      console.log('did-navigate: ');
+      console.log("did-navigate: ");
 
       navigated = true;
-      subtitleSiteDom.removeEventListener('did-navigate', didiNavigateListener)
+      subtitleSiteDom.removeEventListener("did-navigate", didiNavigateListener);
       resolve();
-    }
-    subtitleSiteDom.addEventListener('did-navigate', didiNavigateListener)
+    };
+    subtitleSiteDom.addEventListener("did-navigate", didiNavigateListener);
 
     setTimeout(() => {
       if (!navigated) {
-        console.log('navigated: ', navigated);
+        console.log("navigated: ", navigated);
         reject();
-        subtitleSiteDom.removeEventListener('did-navigate', didiNavigateListener)
+        subtitleSiteDom.removeEventListener(
+          "did-navigate",
+          didiNavigateListener
+        );
       }
     }, 1000);
-  })
-}
+  });
+};
 
-const webviewExcuteJsPromiseWrapprer = <T,>(originDom: HTMLWebViewElement, funcPromise: Promise<T>) => {
+const webviewExcuteJsPromiseWrapprer = <T,>(
+  originDom: HTMLWebViewElement,
+  funcPromise: Promise<T>
+) => {
   return new Promise<T>((resolve, reject) => {
-    funcPromise.then(res => {
-      domNavigateing(originDom).then(() => {
-        if (res) {
-          resolve(res);
-        } else {
-          reject(new Error('未找到指定dom'))
-        }
-      }).catch((err) => {
-        reject(err);
-      })
-    })
-  }).catch(err => {
+    funcPromise.then((res) => {
+      domNavigateing(originDom)
+        .then(() => {
+          if (res) {
+            resolve(res);
+          } else {
+            reject(new Error("未找到指定dom"));
+          }
+        })
+        .catch((err) => {
+          reject(err);
+        });
+    });
+  }).catch((err) => {
     reject(err);
   });
-}
+};
 
 const verifyingCodeFunc = async (subtitleSiteDom: HTMLWebViewElement) => {
   return new Promise<void>((resolve, reject) => {
-    subtitleSiteDom.executeJavaScript(
-      `
+    subtitleSiteDom
+      .executeJavaScript(
+        `
     (function() {
       const element = document.querySelector('.verifyimg');
       return element ? element.getAttribute('src') : null;
     })();
     `
-    ).then((html: string) => {
-      if (html) {
-        const imageBuffer = Buffer.from(html.split(",")[1], "base64");
+      )
+      .then((html: string) => {
+        if (html) {
+          const imageBuffer = Buffer.from(html.split(",")[1], "base64");
 
-        // 调用 Tesseract.js 进行识别
-        recognize(imageBuffer, "eng").then(({
-          data: { text },
-        }) => {
-          console.log(`验证码 : ${text.trim()}`);
+          // 调用 Tesseract.js 进行识别
+          recognize(imageBuffer, "eng").then(({ data: { text } }) => {
+            console.log(`验证码 : ${text.trim()}`);
 
-
-          webviewExcuteJsPromiseWrapprer(subtitleSiteDom, subtitleSiteDom.executeJavaScript(
-            `
+            webviewExcuteJsPromiseWrapprer(
+              subtitleSiteDom,
+              subtitleSiteDom.executeJavaScript(
+                `
           (function() {
             // 获取输入框 DOM 元素
             const inputElement = document.querySelector("#intext");
@@ -103,55 +112,67 @@ const verifyingCodeFunc = async (subtitleSiteDom: HTMLWebViewElement) => {
             }
           })();
         `
-          )).then(() => {
-            setTimeout(() => {
-              subtitleSiteDom.executeJavaScript(
-                `
+              )
+            )
+              .then(() => {
+                setTimeout(() => {
+                  subtitleSiteDom
+                    .executeJavaScript(
+                      `
               (function() {
                 const element = document.getElementsByClassName('item prel clearfix').length;
                 return !!element;
               })();
               `
-              ).then((res: any) => {
-                console.log('res: ', res);
-                if (res) {
-                  resolve();
-                } else {
-                  setTimeout(() => {
-                    verifyingCodeFunc(subtitleSiteDom).then(res=> {
-                      resolve(res)
-                    }).catch(err => {
-                      reject(err);
+                    )
+                    .then((res: any) => {
+                      console.log("res: ", res);
+                      if (res) {
+                        resolve();
+                      } else {
+                        setTimeout(() => {
+                          verifyingCodeFunc(subtitleSiteDom)
+                            .then((res) => {
+                              resolve(res);
+                            })
+                            .catch((err) => {
+                              reject(err);
+                            });
+                        }, 1000);
+                      }
+                    })
+                    .catch((err: any) => {
+                      console.log("err: ", err);
+                      reject();
                     });
-                  }, 1000);
-                }
-              }).catch((err: any) => {
-                console.log('err: ', err);
-                reject();
+                }, 0);
               })
-            }, 0);
-          }).catch(() => {
-            setTimeout(() => {
-              verifyingCodeFunc(subtitleSiteDom).then(res=> {
-                resolve(res)
-              }).catch(innerErr => {
-                reject(innerErr);
+              .catch(() => {
+                setTimeout(() => {
+                  verifyingCodeFunc(subtitleSiteDom)
+                    .then((res) => {
+                      resolve(res);
+                    })
+                    .catch((innerErr) => {
+                      reject(innerErr);
+                    });
+                }, 1000);
               });
-            }, 1000);
-          })
-        })
-      } else {
-        resolve();
-      }
-    });
-  })
-}
+          });
+        } else {
+          resolve();
+        }
+      });
+  });
+};
 
 const subtitleDomExecuteJsMap = {
   verifyingCode: verifyingCodeFunc,
   viewingSearchList: async (subtitleSiteDom: HTMLWebViewElement) => {
-    return webviewExcuteJsPromiseWrapprer(subtitleSiteDom, subtitleSiteDom.executeJavaScript(
-      `
+    return webviewExcuteJsPromiseWrapprer(
+      subtitleSiteDom,
+      subtitleSiteDom.executeJavaScript(
+        `
       (function() {
         const firstSubtitle = document.getElementsByClassName('item prel clearfix')?.[0]?.getElementsByTagName('tr')?.[0]?.getElementsByTagName('a')?.[0];
         if (firstSubtitle) {
@@ -162,11 +183,14 @@ const subtitleDomExecuteJsMap = {
         }
       })();
     `
-    ));
+      )
+    );
   },
   subtitleDetailPage: async (subtitleSiteDom: HTMLWebViewElement) => {
-    return webviewExcuteJsPromiseWrapprer(subtitleSiteDom, subtitleSiteDom.executeJavaScript(
-      `
+    return webviewExcuteJsPromiseWrapprer(
+      subtitleSiteDom,
+      subtitleSiteDom.executeJavaScript(
+        `
                 (function() {
                   const down1Link = document.getElementById('down1')
 
@@ -180,11 +204,14 @@ const subtitleDomExecuteJsMap = {
                   }
                 })();
               `
-    ));
+      )
+    );
   },
   finnalDownloadPage: async (subtitleSiteDom: HTMLWebViewElement) => {
-    return webviewExcuteJsPromiseWrapprer(subtitleSiteDom, subtitleSiteDom.executeJavaScript(
-      `
+    return webviewExcuteJsPromiseWrapprer(
+      subtitleSiteDom,
+      subtitleSiteDom.executeJavaScript(
+        `
                   (function() {
                     const down1Link = document.querySelector("li:nth-child(1) > a")
 
@@ -197,7 +224,8 @@ const subtitleDomExecuteJsMap = {
                     }
                   })();
                 `
-    ));
+      )
+    );
   },
 };
 
@@ -216,7 +244,7 @@ export default forwardRef(function (
 
   useEffect(() => {
     if (!subtitleDomStatus) {
-      return
+      return;
     }
 
     const subtitleSiteDom = subtitleSiteRef.current;
@@ -230,35 +258,37 @@ export default forwardRef(function (
         subtitleSiteDomListenerRef.current
       );
       subtitleSiteDom.removeEventListener("did-fail-load", didFailLoadListener);
-    }
+    };
 
     subtitleSiteDomListenerRef.current = async () => {
       console.log("subtitleDomStatus: ", subtitleDomStatus);
       evtExcuted = true;
       const processExcecution = () => {
-        subtitleDomExecuteJsMap[subtitleDomStatus](subtitleSiteRef.current).then((res) => {
-          console.log(`${subtitleDomStatus} res: `, res);
-          const allStatus = Object.keys(
-            subtitleDomExecuteJsMap
-          ) as SUBTITLE_DOM_STATUS[];
-          const curStatusIndex = allStatus.findIndex(
-            (item) => item === subtitleDomStatus
-          );
-    
-          const nextStatusIndex = curStatusIndex + 1;
-    
-          if (nextStatusIndex >= allStatus.length) {
-            removeAllListener()
-            return;
-          }
-    
-          const nextStatus = allStatus[nextStatusIndex];
-          console.log("nextStatus: ", nextStatus);
-          setSubtitleDomStatus(nextStatus);
-        }).catch(err => {
-          console.log(`${subtitleDomStatus} err: `, err);
-        });
-      }
+        subtitleDomExecuteJsMap[subtitleDomStatus](subtitleSiteRef.current)
+          .then((res) => {
+            console.log(`${subtitleDomStatus} res: `, res);
+            const allStatus = Object.keys(
+              subtitleDomExecuteJsMap
+            ) as SUBTITLE_DOM_STATUS[];
+            const curStatusIndex = allStatus.findIndex(
+              (item) => item === subtitleDomStatus
+            );
+
+            const nextStatusIndex = curStatusIndex + 1;
+
+            if (nextStatusIndex >= allStatus.length) {
+              removeAllListener();
+              return;
+            }
+
+            const nextStatus = allStatus[nextStatusIndex];
+            console.log("nextStatus: ", nextStatus);
+            setSubtitleDomStatus(nextStatus);
+          })
+          .catch((err) => {
+            console.log(`${subtitleDomStatus} err: `, err);
+          });
+      };
 
       processExcecution();
     };
@@ -271,7 +301,7 @@ export default forwardRef(function (
     setTimeout(() => {
       if (!evtExcuted) {
         console.log(`${subtitleDomStatus} evtExcuted: `, evtExcuted);
-        subtitleSiteDomListenerRef.current()
+        subtitleSiteDomListenerRef.current();
       }
     }, 2000);
 
