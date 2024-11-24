@@ -1,16 +1,12 @@
-import { Button } from "antd";
 import {
   forwardRef,
   IframeHTMLAttributes,
   RefObject,
-  useCallback,
   useEffect,
-  useLayoutEffect,
   useRef,
   useState,
 } from "react";
 import { recognize } from "tesseract.js";
-import { tryCathWrapper } from "../utils";
 import { reject } from "lodash";
 
 const didFailLoadListener = (event: Event) => {
@@ -143,62 +139,6 @@ const verifyingCodeFunc = async (subtitleSiteDom: HTMLWebViewElement) => {
               });
             }, 1000);
           })
-        //   subtitleSiteDom.executeJavaScript(
-        //     `
-        //   (function() {
-        //     // 获取输入框 DOM 元素
-        //     const inputElement = document.querySelector("#intext");
-  
-        //     // 填入数字
-        //     inputElement.value = "${text.trim()}";
-  
-        //     setTimeout(() => {
-        //       // 创建一个键盘事件，模拟按下 Enter 键
-        //       const enterEvent = new KeyboardEvent("keypress", {
-        //         bubbles: true,
-        //         cancelable: true,
-        //         key: "Enter",
-        //         code: "Enter",
-        //         keyCode: 13, // 兼容性处理
-        //         which: 13,   // 兼容性处理
-        //       });
-  
-        //       // 派发键盘事件到输入框
-        //       document.body.dispatchEvent(enterEvent);
-        //     }, 0);
-  
-        //   })();
-        // `
-        //   ).then(() => {
-        //     domNavigateing(subtitleSiteDom).then(() => {
-        //       resolve();
-        //     }).catch(() => {
-        //       setTimeout(() => {
-        //         verifyingCodeFunc(subtitleSiteDom);
-        //       }, 1000);
-        //       reject();
-        //     })
-            // setTimeout(() => {
-            //   subtitleSiteDom.executeJavaScript(
-            //     `
-            //   (function() {
-            //     const element = document.getElementsByClassName('item prel clearfix').length;
-            //     return !!element;
-            //   })();
-            //   `
-            //   ).then((res: any) => {
-            //     console.log('res: ', res);
-            //     if (res) {
-            //       resolve();
-            //     } else {
-            //       reject();
-            //     }
-            //   }).catch((err: any) => {
-            //     console.log('err: ', err);
-            //     reject();
-            //   })
-            // }, 2000);
-        //   });
         })
       } else {
         resolve();
@@ -273,122 +213,6 @@ export default forwardRef(function (
     useState<SUBTITLE_DOM_STATUS>();
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   const subtitleSiteDomListenerRef = useRef(async () => {});
-  // const subtitleSiteDomListenerRef = useRef(() => {
-  //   const subtitleSiteDom = subtitleSiteRef.current;
-
-  //   (subtitleSiteDom as any)
-  //     .executeJavaScript(
-  //       `
-  //     (function() {
-  //       const element = document.querySelector('.verifyimg');
-  //       return element ? element.getAttribute('src') : null;
-  //     })();
-  //   `
-  //     )
-  //     .then((html: any) => {
-  //       if (html) {
-  //         const imageBuffer = Buffer.from(html.split(",")[1], "base64");
-
-  //         // 调用 Tesseract.js 进行识别
-  //         recognize(imageBuffer, "eng")
-  //           .then(({ data: { text } }) => {
-  //             console.log(`验证码 : ${text.trim()}`);
-
-  //             (subtitleSiteDom as any).executeJavaScript(
-  //               `
-  //               (function() {
-  //                 // 获取输入框 DOM 元素
-  //                 const inputElement = document.querySelector("#intext");
-
-  //                 // 填入数字
-  //                 inputElement.value = "${text.trim()}";
-
-  //                 setTimeout(() => {
-  //                   // 创建一个键盘事件，模拟按下 Enter 键
-  //                   const enterEvent = new KeyboardEvent("keypress", {
-  //                     bubbles: true,
-  //                     cancelable: true,
-  //                     key: "Enter",
-  //                     code: "Enter",
-  //                     keyCode: 13, // 兼容性处理
-  //                     which: 13,   // 兼容性处理
-  //                   });
-
-  //                   // 派发键盘事件到输入框
-  //                   document.body.dispatchEvent(enterEvent);
-  //                 }, 2000);
-
-  //               })();
-  //             `
-  //             );
-
-  //             subtitleSiteDom.removeEventListener(
-  //               "load",
-  //               subtitleSiteDomListenerRef.current
-  //             );
-  //             //  jump to subtitle search list
-  //             subtitleSiteDomListenerRef.current = () => {
-  //               console.log("ready: 2");
-  //               (subtitleSiteDom as any).executeJavaScript(
-  //                 `
-  //               (function() {
-  //                 document.getElementsByClassName('item prel clearfix')?.[0]?.getElementsByTagName('tr')?.[0]?.getElementsByTagName('a')?.click()
-  //               })();
-  //             `
-  //               );
-
-  //               //  jump to subtitle ready to download page
-  //               subtitleSiteDom.removeEventListener(
-  //                 "load",
-  //                 subtitleSiteDomListenerRef.current
-  //               );
-  //               subtitleSiteDomListenerRef.current = () => {
-  //                 console.log("ready: 3");
-  //                 (subtitleSiteDom as any).executeJavaScript(
-  //                   `
-  //                 (function() {
-  //                   document.getElementById('down1').click()
-  //                 })();
-  //               `
-  //                 );
-  //                 // jump to finnally download page
-  //                 subtitleSiteDom.removeEventListener(
-  //                   "load",
-  //                   subtitleSiteDomListenerRef.current
-  //                 );
-  //                 subtitleSiteDomListenerRef.current = () => {
-  //                   console.log("ready: 4");
-  //                   (subtitleSiteDom as any).executeJavaScript(
-  //                     `
-  //                   (function() {
-  //                     document.querySelector("li:nth-child(1) > a").click()
-  //                   })();
-  //                 `
-  //                   );
-  //                 };
-  //                 subtitleSiteDom.addEventListener(
-  //                   "load",
-  //                   subtitleSiteDomListenerRef.current
-  //                 );
-  //               };
-  //               subtitleSiteDom.addEventListener(
-  //                 "load",
-  //                 subtitleSiteDomListenerRef.current
-  //               );
-  //             };
-  //             subtitleSiteDom.addEventListener(
-  //               "load",
-  //               subtitleSiteDomListenerRef.current
-  //             );
-  //           })
-  //           .catch((error) => {
-  //             console.error(`验证码  识别失败:`, error);
-  //           });
-  //       } else {
-  //         console.error('Element with class "verifyimg" not found.');
-  //       }
-  //     });
-  // });
 
   useEffect(() => {
     if (!subtitleDomStatus) {
@@ -433,10 +257,6 @@ export default forwardRef(function (
           setSubtitleDomStatus(nextStatus);
         }).catch(err => {
           console.log(`${subtitleDomStatus} err: `, err);
-          // if (subtitleDomStatus === 'verifyingCode') {
-          //   console.log('verifyingCode: again');
-          //   processExcecution();
-          // }
         });
       }
 
