@@ -5,6 +5,10 @@ declare global {
     electron: ElectronAPI
     api: PreloadAPITypes
   }
+
+  interface HTMLWebViewElement {
+    executeJavaScript: (value: string) => Promise<T>
+  }
 }
 
 declare namespace NodeJS {
