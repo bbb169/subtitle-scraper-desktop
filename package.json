@@ -21,6 +21,7 @@
     "@electron-forge/plugin-fuses": "^7.5.0",
     "@electron-forge/plugin-vite": "^7.5.0",
     "@electron/fuses": "^1.8.0",
+    "@types/lodash": "^4.17.13",
     "@types/qs": "^6.9.17",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
@@ -48,9 +49,11 @@
     "@electron-toolkit/preload": "^3.0.1",
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
+    "ahooks": "^3.8.1",
     "antd": "^5.22.1",
     "axios": "^1.7.7",
     "electron-squirrel-startup": "^1.0.1",
+    "lodash": "^4.17.21",
     "qs": "^6.13.1",
     "react": "^18.3.1"
   }
