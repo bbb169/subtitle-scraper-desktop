@@ -67,11 +67,11 @@ const verifyingCodeFunc = async (subtitleSiteDom: HTMLWebViewElement) => {
     subtitleSiteDom
       .executeJavaScript(
         `
-    (function() {
-      const element = document.querySelector('.verifyimg');
-      return element ? element.getAttribute('src') : null;
-    })();
-    `
+        (function() {
+          const element = document.querySelector('.verifyimg');
+          return element ? element.getAttribute('src') : null;
+        })();
+        `
       )
       .then((html: string) => {
         if (html) {
@@ -85,33 +85,33 @@ const verifyingCodeFunc = async (subtitleSiteDom: HTMLWebViewElement) => {
               subtitleSiteDom,
               subtitleSiteDom.executeJavaScript(
                 `
-          (function() {
-            // 获取输入框 DOM 元素
-            const inputElement = document.querySelector("#intext");
-  
-            if (inputElement) {
-            
-              // 填入数字
-              inputElement.value = "${text.trim()}";
-    
-              // 创建一个键盘事件，模拟按下 Enter 键
-                const enterEvent = new KeyboardEvent("keypress", {
-                  bubbles: true,
-                  cancelable: true,
-                  key: "Enter",
-                  code: "Enter",
-                  keyCode: 13, // 兼容性处理
-                  which: 13,   // 兼容性处理
-                });
-  
-              // 派发键盘事件到输入框
-              document.body.dispatchEvent(enterEvent);
-              return true
-            } else {
-              return false
-            }
-          })();
-        `
+                (function() {
+                  // 获取输入框 DOM 元素
+                  const inputElement = document.querySelector("#intext");
+        
+                  if (inputElement) {
+                  
+                    // 填入数字
+                    inputElement.value = "${text.trim()}";
+          
+                    // 创建一个键盘事件，模拟按下 Enter 键
+                      const enterEvent = new KeyboardEvent("keypress", {
+                        bubbles: true,
+                        cancelable: true,
+                        key: "Enter",
+                        code: "Enter",
+                        keyCode: 13, // 兼容性处理
+                        which: 13,   // 兼容性处理
+                      });
+        
+                    // 派发键盘事件到输入框
+                    document.body.dispatchEvent(enterEvent);
+                    return true
+                  } else {
+                    return false
+                  }
+                })();
+              `
               )
             )
               .then(() => {
@@ -119,11 +119,11 @@ const verifyingCodeFunc = async (subtitleSiteDom: HTMLWebViewElement) => {
                   subtitleSiteDom
                     .executeJavaScript(
                       `
-              (function() {
-                const element = document.getElementsByClassName('item prel clearfix').length;
-                return !!element;
-              })();
-              `
+                      (function() {
+                        const element = document.getElementsByClassName('item prel clearfix').length;
+                        return !!element;
+                      })();
+                      `
                     )
                     .then((res: any) => {
                       console.log("res: ", res);
@@ -173,16 +173,16 @@ const subtitleDomExecuteJsMap = {
       subtitleSiteDom,
       subtitleSiteDom.executeJavaScript(
         `
-      (function() {
-        const firstSubtitle = document.getElementsByClassName('item prel clearfix')?.[0]?.getElementsByTagName('tr')?.[0]?.getElementsByTagName('a')?.[0];
-        if (firstSubtitle) {
-          window.location.href = firstSubtitle.href;
-          return true;
-        } else {
-          return false;
-        }
-      })();
-    `
+          (function() {
+            const firstSubtitle = document.getElementsByClassName('item prel clearfix')?.[0]?.getElementsByTagName('tr')?.[0]?.getElementsByTagName('a')?.[0];
+            if (firstSubtitle) {
+              window.location.href = firstSubtitle.href;
+              return true;
+            } else {
+              return false;
+            }
+          })();
+        `
       )
     );
   },
@@ -191,19 +191,19 @@ const subtitleDomExecuteJsMap = {
       subtitleSiteDom,
       subtitleSiteDom.executeJavaScript(
         `
-                (function() {
-                  const down1Link = document.getElementById('down1')
+          (function() {
+            const down1Link = document.getElementById('down1')
 
 
-                  if (down1Link) {
-                    alert(document.getElementById('down1').href)
-                    window.location.href = down1Link.href;
-                    return true
-                  } else {
-                    return false
-                  }
-                })();
-              `
+            if (down1Link) {
+              alert(document.getElementById('down1').href)
+              window.location.href = down1Link.href;
+              return true
+            } else {
+              return false
+            }
+          })();
+        `
       )
     );
   },
@@ -212,18 +212,18 @@ const subtitleDomExecuteJsMap = {
       subtitleSiteDom,
       subtitleSiteDom.executeJavaScript(
         `
-                  (function() {
-                    const down1Link = document.querySelector("li:nth-child(1) > a")
+          (function() {
+            const down1Link = document.querySelector("li:nth-child(1) > a")
 
-                    if (down1Link) {
-                      alert(down1Link.href)
-                      window.location.href = down1Link.href;
-                      return true
-                    } else {
-                      return false
-                    }
-                  })();
-                `
+            if (down1Link) {
+              alert(down1Link.href)
+              window.location.href = down1Link.href;
+              return true
+            } else {
+              return false
+            }
+          })();
+        `
       )
     );
   },
