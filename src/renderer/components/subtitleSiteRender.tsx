@@ -177,7 +177,7 @@ const subtitleDomExecuteJsMap = {
             const firstSubtitle = document.getElementsByClassName('item prel clearfix')?.[0]?.getElementsByTagName('tr')?.[0]?.getElementsByTagName('a')?.[0];
             if (firstSubtitle) {
               window.location.href = firstSubtitle.href;
-              return true;
+              return firstSubtitle.href;
             } else {
               return false;
             }
@@ -194,11 +194,9 @@ const subtitleDomExecuteJsMap = {
           (function() {
             const down1Link = document.getElementById('down1')
 
-
             if (down1Link) {
-              alert(document.getElementById('down1').href)
               window.location.href = down1Link.href;
-              return true
+              return down1Link.href
             } else {
               return false
             }
@@ -216,9 +214,8 @@ const subtitleDomExecuteJsMap = {
             const down1Link = document.querySelector("li:nth-child(1) > a")
 
             if (down1Link) {
-              alert(down1Link.href)
               window.location.href = down1Link.href;
-              return true
+              return down1Link.href
             } else {
               return false
             }
