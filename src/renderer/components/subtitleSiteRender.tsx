@@ -286,6 +286,7 @@ export default forwardRef(function (
             setSubtitleDomStatus(nextStatus);
           })
           .catch((err) => {
+            removeAllListener();
             console.log(`${subtitleDomStatus} err: `, err);
           });
     };
