@@ -63,7 +63,7 @@ const webviewExcuteJsPromiseWrapprer = <T,>(
   });
 };
 
-const verifyingCodeFunc = async (subtitleSiteDom: HTMLWebViewElement) => {
+const verifyingCodeFunc = (subtitleSiteDom: HTMLWebViewElement) => {
   return new Promise<void>((resolve, reject) => {
     subtitleSiteDom
       .executeJavaScript(
@@ -169,7 +169,7 @@ const verifyingCodeFunc = async (subtitleSiteDom: HTMLWebViewElement) => {
 
 const subtitleDomExecuteJsMap = {
   verifyingCode: verifyingCodeFunc,
-  viewingSearchList: async (subtitleSiteDom: HTMLWebViewElement) => {
+  viewingSearchList: (subtitleSiteDom: HTMLWebViewElement) => {
     return webviewExcuteJsPromiseWrapprer(
       subtitleSiteDom,
       subtitleSiteDom.executeJavaScript(
@@ -187,7 +187,7 @@ const subtitleDomExecuteJsMap = {
       )
     );
   },
-  subtitleDetailPage: async (subtitleSiteDom: HTMLWebViewElement) => {
+  subtitleDetailPage: (subtitleSiteDom: HTMLWebViewElement) => {
     return webviewExcuteJsPromiseWrapprer(
       subtitleSiteDom,
       subtitleSiteDom.executeJavaScript(
@@ -206,7 +206,7 @@ const subtitleDomExecuteJsMap = {
       )
     );
   },
-  finnalDownloadPage: async (subtitleSiteDom: HTMLWebViewElement) => {
+  finnalDownloadPage: (subtitleSiteDom: HTMLWebViewElement) => {
     return webviewExcuteJsPromiseWrapprer(
       subtitleSiteDom,
       subtitleSiteDom.executeJavaScript(
