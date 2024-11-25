@@ -302,7 +302,7 @@ export default forwardRef(function (
         subtitleSiteDomListenerRef.current();
         evtExcuted = true;
       }
-    }, 1000);
+    }, 2000);
 
     return removeAllListener;
   }, [subtitleDomStatus]);
