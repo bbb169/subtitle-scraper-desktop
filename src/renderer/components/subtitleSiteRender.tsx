@@ -35,7 +35,7 @@ const domNavigateing = (subtitleSiteDom: HTMLWebViewElement) => {
           didiNavigateListener
         );
       }
-    }, 1000);
+    }, 2000);
   });
 };
 
