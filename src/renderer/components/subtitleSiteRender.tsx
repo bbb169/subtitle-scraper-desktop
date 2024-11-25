@@ -48,17 +48,18 @@ const webviewExcuteJsPromiseWrapprer = <T,>(
       domNavigateing(originDom)
         .then(() => {
           if (res) {
+            console.log('funcPromiseres: ', res);
             resolve(res);
           } else {
             reject(new Error("未找到指定dom"));
           }
         })
         .catch((err) => {
+          console.log('domNavigateing err: ', err);
+          console.log('domNavigateing res: ', res);
           reject(err);
         });
     });
-  }).catch((err) => {
-    reject(err);
   });
 };
 
