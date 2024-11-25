@@ -259,9 +259,11 @@ export default forwardRef(function (
 
     subtitleSiteDomListenerRef.current = async () => {
       console.log("subtitleDomStatus: ", subtitleDomStatus);
+      if (evtExcuted) {
+        return
+      }
       evtExcuted = true;
-      const processExcecution = () => {
-        subtitleDomExecuteJsMap[subtitleDomStatus](subtitleSiteRef.current)
+      subtitleDomExecuteJsMap[subtitleDomStatus](subtitleSiteRef.current)
           .then((res) => {
             console.log(`${subtitleDomStatus} res: `, res);
             const allStatus = Object.keys(
@@ -285,9 +287,6 @@ export default forwardRef(function (
           .catch((err) => {
             console.log(`${subtitleDomStatus} err: `, err);
           });
-      };
-
-      processExcecution();
     };
     subtitleSiteDom.addEventListener(
       "dom-ready",
@@ -299,8 +298,9 @@ export default forwardRef(function (
       if (!evtExcuted) {
         console.log(`${subtitleDomStatus} evtExcuted: `, evtExcuted);
         subtitleSiteDomListenerRef.current();
+        evtExcuted = true;
       }
-    }, 2000);
+    }, 1000);
 
     return removeAllListener;
   }, [subtitleDomStatus]);
