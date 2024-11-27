@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog, ipcMain, ipcRenderer, session } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, ipcRenderer, session, webUtils } from 'electron';
 import path from 'path';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -40,10 +40,14 @@ const createWindow = async () => {
   ipcMain.handle('openUploadDialog', async () => {
     const options = {
       title: '选择文件',
-      buttonLabel: '上传',
+      buttonLabel: '确认',
     };
 
     return dialog.showOpenDialog(mainWindow, options)
+  });
+
+  ipcMain.handle('getPathForFile', async () => {
+    return webUtils.getPathForFile
   });
 };
 

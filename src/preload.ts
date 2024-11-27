@@ -8,6 +8,9 @@ const api: PreloadAPITypes = {
   async openUploadDialog() {
     return await ipcRenderer.invoke('openUploadDialog')
   },
+  async getPathForFile() {
+    return await ipcRenderer.invoke('getPathForFile')
+  }
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to
