@@ -7,7 +7,6 @@ import {
   useState,
 } from "react";
 import { recognize } from "tesseract.js";
-import { reject } from "lodash";
 
 const didFailLoadListener = (event: Event) => {
   console.error("Failed to load:", event);
