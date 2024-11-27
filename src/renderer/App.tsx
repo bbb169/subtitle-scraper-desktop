@@ -34,11 +34,12 @@ export default function () {
       chost: 'zimuku.org',
     })}`}/>}
     <Button onClick={() => { window.api.openUploadDialog().then(res => {
-      console.log('res: ', res.filePaths[0]);
+      console.log('res: ', res);
       const fullPath = res.filePaths[0];
       const pathNodes = fullPath.split('\\');
       const fileName = pathNodes?.[pathNodes.length - 1] || '';
       console.log('fileName: ', fileName);
     }) }}>打开系统上传</Button>
+    <input name="file" type="file" accept="" ></input>
   </Space>
 }

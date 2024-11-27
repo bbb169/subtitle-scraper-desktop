@@ -19,7 +19,11 @@ export default function(props: UploadProps & { onFilenameHandled?: (value: strin
         extra: (file) => <Button size='small' style={{ marginLeft: 8 }} type='text' onClick={() => { copyToClipboard(file.name) }} icon={<CopyOutlined />} />
       },
       customRequest({ file, onError, onProgress, onSuccess }) {
-        console.log('file: ', file);
+        console.log('file: ', file,  window.api.getPathForFile().then(func => {
+          console.log('path', func(file as any));
+          
+        }));
+       
         const filename = (file as any).name || '' as string;
         onProgress({ percent: 50 })
         
