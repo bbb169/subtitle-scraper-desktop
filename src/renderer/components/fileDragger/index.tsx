@@ -3,6 +3,7 @@ import { CopyOutlined, VideoCameraAddOutlined } from '@ant-design/icons';
 import type { UploadProps } from 'antd';
 import { Button, Space, Upload } from 'antd';
 import { copyToClipboard } from '../../utils/handleDom';
+const { webUtils } = require('electron');
 
 const { Dragger } = Upload;
 
@@ -19,10 +20,7 @@ export default function(props: UploadProps & { onFilenameHandled?: (value: strin
         extra: (file) => <Button size='small' style={{ marginLeft: 8 }} type='text' onClick={() => { copyToClipboard(file.name) }} icon={<CopyOutlined />} />
       },
       customRequest({ file, onError, onProgress, onSuccess }) {
-        console.log('file: ', file,  window.api.getPathForFile().then(func => {
-          console.log('path', func(file as any));
-          
-        }));
+        console.log('file: ', file,  webUtils.getPathForFile(file as any));
        
         const filename = (file as any).name || '' as string;
         onProgress({ percent: 50 })

@@ -47,7 +47,7 @@ const createWindow = async () => {
   });
 
   ipcMain.handle('getPathForFile', async () => {
-    return webUtils.getPathForFile
+    return webUtils?.getPathForFile
   });
 };
 
