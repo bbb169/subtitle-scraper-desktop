@@ -3,16 +3,14 @@ import { CopyOutlined, VideoCameraAddOutlined } from '@ant-design/icons';
 import type { UploadProps } from 'antd';
 import { Button, Space, Upload } from 'antd';
 import { copyToClipboard } from '../../utils/handleDom';
+import useFileInfoStore from '../../store/fileInfo';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const { webUtils } = require('electron');
 
 const { Dragger } = Upload;
 
-export default function(props: UploadProps & { onFilenameHandled?: (value: string) => void }) {
-  const { onFilenameHandled, ...otherProps } = props;
-  const [resolvedFilename, setResolvedFilename] = useState<string>();
-  useEffect(() => {
-    onFilenameHandled?.(resolvedFilename)
-  }, [resolvedFilename])
+export default function(props: UploadProps) {
+  const { setFileInfo } = useFileInfoStore();
   
   return <Dragger {...{
       multiple: true,
@@ -27,14 +25,17 @@ export default function(props: UploadProps & { onFilenameHandled?: (value: strin
         
         let validContentTimes = 0;
 
-        setResolvedFilename(filename.split(/[^\u4e00-\u9fa5a-zA-Z]+/).reduce((preValue: string, curValue: string) => {
-          // only collect two valid content in filename
-          if (curValue && validContentTimes < 2) {
-            validContentTimes++
-            return preValue + ' ' + curValue; 
-          }
-          return preValue
-        }, ''))
+        setFileInfo({
+          resolvedFileName: filename.split(/[^\u4e00-\u9fa5a-zA-Z]+/).reduce((preValue: string, curValue: string) => {
+            // only collect two valid content in filename
+            if (curValue && validContentTimes < 2) {
+              validContentTimes++
+              return preValue + ' ' + curValue; 
+            }
+            return preValue
+          }, ''),
+          filePath
+        })
         if (filename) {
           onSuccess(filename)
         } else {
