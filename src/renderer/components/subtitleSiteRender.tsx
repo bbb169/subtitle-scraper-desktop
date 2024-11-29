@@ -7,6 +7,8 @@ import {
   useState,
 } from "react";
 import { recognize } from "tesseract.js";
+import useFileInfoStore from "../store/fileInfo";
+import { message } from "antd";
 
 const didFailLoadListener = (event: Event) => {
   console.error("Failed to load:", event);
@@ -206,22 +208,18 @@ const subtitleDomExecuteJsMap = {
     );
   },
   finnalDownloadPage: (subtitleSiteDom: HTMLWebViewElement) => {
-    return webviewExcuteJsPromiseWrapprer(
-      subtitleSiteDom,
-      subtitleSiteDom.executeJavaScript(
-        `
-          (function() {
-            const down1Link = document.querySelector("li:nth-child(1) > a")
+    return subtitleSiteDom.executeJavaScript(
+      `
+        (function() {
+          const down1Link = document.querySelector("li:nth-child(1) > a")
 
-            if (down1Link) {
-              window.location.href = down1Link.href;
-              return down1Link.href
-            } else {
-              return false
-            }
-          })();
-        `
-      )
+          if (down1Link) {
+            return down1Link.href
+          } else {
+            return false
+          }
+        })();
+      `
     );
   },
 };
@@ -233,6 +231,7 @@ export default forwardRef(function (
   ref: RefObject<HTMLIFrameElement>
 ) {
   const { src } = props;
+  const { filePath } = useFileInfoStore();
   const subtitleSiteRef = useRef<HTMLWebViewElement>();
   const [subtitleDomStatus, setSubtitleDomStatus] =
     useState<SUBTITLE_DOM_STATUS>();
@@ -266,6 +265,14 @@ export default forwardRef(function (
       subtitleDomExecuteJsMap[subtitleDomStatus](subtitleSiteRef.current)
           .then((res) => {
             console.log(`${subtitleDomStatus} res: `, res);
+
+            if (subtitleDomStatus === 'finnalDownloadPage' && res) {
+              console.log('res, filePath: ', res, filePath);
+
+              window.api.downloadFile(res, filePath).then((res) => {
+                message.success(`字幕成功写入${res}`)
+              })
+            }
             const allStatus = Object.keys(
               subtitleDomExecuteJsMap
             ) as SUBTITLE_DOM_STATUS[];

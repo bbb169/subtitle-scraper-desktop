@@ -18,7 +18,8 @@ export default function(props: UploadProps) {
         extra: (file) => <Button size='small' style={{ marginLeft: 8 }} type='text' onClick={() => { copyToClipboard(file.name) }} icon={<CopyOutlined />} />
       },
       customRequest({ file, onError, onProgress, onSuccess }) {
-        console.log('file: ', file,  webUtils.getPathForFile(file as any));
+        const filePath = webUtils.getPathForFile(file as any)?.split('\\').slice(0, -1).join('\\');
+        console.log('file: ', file,  filePath);
        
         const filename = (file as any).name || '' as string;
         onProgress({ percent: 50 })
@@ -42,7 +43,7 @@ export default function(props: UploadProps) {
           onError(new Error('未获取到文件名'))
         }
       },
-      ...otherProps,
+      ...props,
     }}>
     <p className="ant-upload-drag-icon">
       <VideoCameraAddOutlined />
