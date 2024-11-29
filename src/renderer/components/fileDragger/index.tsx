@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { CopyOutlined, VideoCameraAddOutlined } from '@ant-design/icons';
 import type { UploadProps } from 'antd';
-import { Button, Space, Upload } from 'antd';
+import { Button, Upload } from 'antd';
 import { copyToClipboard } from '../../utils/handleDom';
 import useFileInfoStore from '../../store/fileInfo';
 // eslint-disable-next-line @typescript-eslint/no-var-requires

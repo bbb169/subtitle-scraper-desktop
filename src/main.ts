@@ -3,14 +3,10 @@ import {
   BrowserWindow,
   dialog,
   ipcMain,
-  ipcRenderer,
   session,
-  webUtils,
 } from "electron";
 import * as fs from "node:fs";
 import path from "path";
-import https from "https";
-import http from "http";
 import axios from "axios";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
