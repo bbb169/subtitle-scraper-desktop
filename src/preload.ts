@@ -8,8 +8,11 @@ const api: PreloadAPITypes = {
   async openUploadDialog() {
     return await ipcRenderer.invoke('openUploadDialog')
   },
-  async getPathForFile() {
-    return await ipcRenderer.invoke('getPathForFile')
+  async useFs() {
+    return await ipcRenderer.invoke('useFs')
+  },
+  async downloadFile(fileUrl: string, savePath: string) {
+    return await ipcRenderer.invoke('downloadFile', fileUrl, savePath)
   }
 }
 

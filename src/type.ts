@@ -1,6 +1,8 @@
 import { webUtils } from "electron"
+import * as fs from 'node:fs';
 
 export interface PreloadAPITypes {
   openUploadDialog: () => Promise<Electron.OpenDialogReturnValue>
-  getPathForFile: () => Promise<typeof webUtils.getPathForFile>
+  useFs: () =>Promise<typeof fs>
+  downloadFile: (fileUrl: string, savePath: string) => Promise<string>
 }
