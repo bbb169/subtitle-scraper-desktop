@@ -9,6 +9,7 @@ import {
 import { recognize } from "tesseract.js";
 import useFileInfoStore from "../store/fileInfo";
 import { message } from "antd";
+import useUserSettingfoStore from "../store/userSetting";
 
 const didFailLoadListener = (event: Event) => {
   console.error("Failed to load:", event);
@@ -207,13 +208,16 @@ const subtitleDomExecuteJsMap = {
       )
     );
   },
-  finnalDownloadPage: (subtitleSiteDom: HTMLWebViewElement) => {
+  finnalDownloadPage: (subtitleSiteDom: HTMLWebViewElement, downloadFileByRequest = false) => {
     return subtitleSiteDom.executeJavaScript(
       `
         (function() {
           const down1Link = document.querySelector("li:nth-child(1) > a")
 
           if (down1Link) {
+            if (!${downloadFileByRequest}) {
+              window.location.href = down1Link.href
+            }
             return down1Link.href
           } else {
             return false
@@ -232,6 +236,7 @@ export default forwardRef(function (
 ) {
   const { src } = props;
   const { filePath } = useFileInfoStore();
+  const { downloadToFolderDirectly, defaultDownloadFolderPath } = useUserSettingfoStore();
   const subtitleSiteRef = useRef<HTMLWebViewElement>();
   const [subtitleDomStatus, setSubtitleDomStatus] =
     useState<SUBTITLE_DOM_STATUS>();
@@ -262,7 +267,14 @@ export default forwardRef(function (
         return
       }
       evtExcuted = true;
-      subtitleDomExecuteJsMap[subtitleDomStatus](subtitleSiteRef.current)
+      const appendArgs: any[] = [];
+
+      // `finnalDownloadPage` downloadFileByRequest = true
+      if (subtitleDomStatus === 'finnalDownloadPage' && (downloadToFolderDirectly || defaultDownloadFolderPath)) {
+        appendArgs.push(true)
+      }
+
+      subtitleDomExecuteJsMap[subtitleDomStatus](subtitleSiteRef.current, ...appendArgs)
           .then((res) => {
             console.log(`${subtitleDomStatus} res: `, res);
 
