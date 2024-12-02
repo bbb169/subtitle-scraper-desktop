@@ -15,10 +15,6 @@ const decompressTar = require('decompress-tar');//.tar
 const decompressTarbz2 = require('decompress-tarbz2'); // .gz
 const decompressTargz = require('decompress-targz'); // .bz2
 const decompressUnzip = require('decompress-unzip'); // .zip
-// import decompressTar from 'decompress-tar'; //.tar
-// import decompressZip from 'decompress-targz'; // .gz
-// import decompressGzip from 'decompress-tarbz2'; // .bz2
-// import decompressBzip2 from 'decompress-unzip'; // .zip
 // 常见压缩包后缀
 const compressedExtensions = ['.zip', '.rar', '.7z', '.tar', '.gz', '.bz2'];
 

@@ -282,7 +282,13 @@ export default forwardRef(function (
               console.log('res, filePath: ', res, filePath);
 
               window.api.downloadFile(res, filePath).then((res) => {
-                message.success(`字幕成功写入${res}`)
+                if (res.unziped) {
+                  message.success(`字幕成功解压缩到${res.savePath}`)
+                } else {
+                  message.success(`字幕成功写入${res.savePath}`)
+                }
+              }).catch(err => {
+                message.error(`字幕下载失败：${err}`)
               })
             }
             const allStatus = Object.keys(
