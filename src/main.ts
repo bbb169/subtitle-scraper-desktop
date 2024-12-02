@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 import {
   app,
   BrowserWindow,
@@ -8,6 +9,32 @@ import {
 import * as fs from "node:fs";
 import path from "path";
 import axios from "axios";
+import { DownloadFileResult } from "./type";
+const decompress = require('decompress');
+const decompressTar = require('decompress-tar');//.tar
+const decompressTarbz2 = require('decompress-tarbz2'); // .gz
+const decompressTargz = require('decompress-targz'); // .bz2
+const decompressUnzip = require('decompress-unzip'); // .zip
+// import decompressTar from 'decompress-tar'; //.tar
+// import decompressZip from 'decompress-targz'; // .gz
+// import decompressGzip from 'decompress-tarbz2'; // .bz2
+// import decompressBzip2 from 'decompress-unzip'; // .zip
+// 常见压缩包后缀
+const compressedExtensions = ['.zip', '.rar', '.7z', '.tar', '.gz', '.bz2'];
+
+
+const plugins = [
+  decompressTar(),
+  decompressTarbz2(),
+  decompressTargz(),
+  decompressUnzip(),
+];
+
+// 识别并解压压缩包
+function decompressFile(inputFile: string, outputDir: string) {
+  return decompress(inputFile, outputDir, { plugins }) as Promise<any>
+}
+
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require("electron-squirrel-startup")) {
@@ -102,6 +129,7 @@ const createWindow = async () => {
         fileName = path.basename(urlPath) || fileName;
       }
       
+      const extension = path.extname(fileName).toLowerCase();
       const savePath = path.join(saveDir, fileName); // 完整的文件路径
       console.log('savePath: ', savePath);
       // 将响应数据写入文件
@@ -109,10 +137,25 @@ const createWindow = async () => {
       response.data.pipe(writer);
   
       // 返回一个 Promise，以便在写入完成后继续执行
-      return new Promise<string>((resolve, reject) => {
+      return new Promise<DownloadFileResult>((resolve, reject) => {
         writer.on('finish', () => {
           console.log(`文件已成功下载到: ${savePath}`);
-          resolve(savePath);
+          if (compressedExtensions.includes(extension)) {
+            console.log('文件是压缩包，正在解压缩...');
+            decompressFile(savePath, saveDir).then(() => {
+              resolve({
+                unziped: true,
+                savePath: saveDir
+              })
+            }).catch(err => {
+              reject(err)
+            })
+          }
+
+          resolve({
+            unziped: false,
+            savePath,
+          });
         });
         writer.on('error', (err) => {
           reject(err);
