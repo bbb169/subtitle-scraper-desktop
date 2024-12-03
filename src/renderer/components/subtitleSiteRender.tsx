@@ -242,6 +242,7 @@ export default forwardRef(function (
     useState<SUBTITLE_DOM_STATUS>();
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   const subtitleSiteDomListenerRef = useRef(async () => {});
+  const mergedFilePath = filePath || defaultDownloadFolderPath;
 
   useEffect(() => {
     if (!subtitleDomStatus) {
@@ -279,9 +280,9 @@ export default forwardRef(function (
             console.log(`${subtitleDomStatus} res: `, res);
 
             if (subtitleDomStatus === 'finnalDownloadPage' && res) {
-              console.log('res, filePath: ', res, filePath);
+              console.log('res, filePath: ', res, mergedFilePath);
 
-              window.api.downloadFile(res, filePath).then((res) => {
+              window.api.downloadFile(res, mergedFilePath).then((res) => {
                 if (res.unziped) {
                   message.success(`字幕成功解压缩到${res.savePath}`)
                 } else {
