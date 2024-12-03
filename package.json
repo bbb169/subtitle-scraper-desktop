@@ -25,6 +25,7 @@
     "@types/qs": "^6.9.17",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
+    "@types/unzipper": "^0.10.10",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.0.0",
     "cheerio": "^1.0.0",
@@ -46,6 +47,7 @@
   "license": "MIT",
   "dependencies": {
     "@ant-design/icons": "^5.5.1",
+    "@aws-sdk/client-s3": "^3.703.0",
     "@electron-toolkit/preload": "^3.0.1",
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
@@ -61,6 +63,7 @@
     "lodash": "^4.17.21",
     "qs": "^6.13.1",
     "react": "^18.3.1",
+    "unzipper": "^0.12.3",
     "zustand": "^5.0.1"
   }
 }
