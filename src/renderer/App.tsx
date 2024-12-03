@@ -48,7 +48,7 @@ export default function () {
 
       reject();
     })
-  }), { throttleWait: 1000, throttleLeading: true, throttleTrailing: false })
+  }), { throttleWait: 1000, throttleLeading: true, throttleTrailing: false, manual: true })
 
   return (
     <Space direction="vertical" style={{ width: "100%" }}>
