@@ -216,7 +216,8 @@ const subtitleDomExecuteJsMap = {
 
           if (down1Link) {
             if (!${downloadFileByRequest}) {
-              window.location.href = down1Link.href
+              window.location.href = down1Link.href;
+              return true
             }
             return down1Link.href
           } else {
@@ -271,7 +272,7 @@ export default forwardRef(function (
       const appendArgs: any[] = [];
 
       // `finnalDownloadPage` downloadFileByRequest = true
-      if (subtitleDomStatus === 'finnalDownloadPage' && (downloadToFolderDirectly || defaultDownloadFolderPath)) {
+      if (subtitleDomStatus === 'finnalDownloadPage' && ((downloadToFolderDirectly && mergedFilePath) || defaultDownloadFolderPath)) {
         appendArgs.push(true)
       }
 
@@ -279,7 +280,7 @@ export default forwardRef(function (
           .then((res) => {
             console.log(`${subtitleDomStatus} res: `, res);
 
-            if (subtitleDomStatus === 'finnalDownloadPage' && res) {
+            if (subtitleDomStatus === 'finnalDownloadPage' && res?.length) {
               console.log('res, filePath: ', res, mergedFilePath);
 
               window.api.downloadFile(res, mergedFilePath).then((res) => {
