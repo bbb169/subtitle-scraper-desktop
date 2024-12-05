@@ -6,6 +6,12 @@ export interface DownloadFileResult {
   savePath: string;
 }
 
+export interface UserSettingfo {
+  downloadToFolderDirectly?: boolean;
+  defaultDownloadFolderPath?: string;
+  setUserSettingfo: (value: Omit<UserSettingfo, 'setUserSettingfo'>) => void;
+}
+
 export interface PreloadAPITypes {
   openUploadDialog: () => Promise<Electron.OpenDialogReturnValue>
   useFs: () =>Promise<typeof fs>

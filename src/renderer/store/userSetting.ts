@@ -1,15 +1,17 @@
 import { create } from "zustand";
-
-export interface UserSettingfo {
-  downloadToFolderDirectly?: boolean;
-  defaultDownloadFolderPath?: string;
-  setUserSettingfo: (value: Omit<UserSettingfo, 'setUserSettingfo'>) => void;
-}
+import { getStoreData, storeData } from "../utils/storage";
+import { UserSettingfo } from "../../type";
 
 // 创建 store
 const useUserSettingfoStore = create<UserSettingfo>((set) => ({
-  downloadToFolderDirectly: true,
-  setUserSettingfo: (value) => set((state) => ({ ...state, ...value })),
+  downloadToFolderDirectly: getStoreData('downloadToFolderDirectly') || true,
+  defaultDownloadFolderPath: getStoreData('defaultDownloadFolderPath') || '',
+  setUserSettingfo: (value) => set((state) => {
+    const nextState = { ...state, ...value };
+    storeData('defaultDownloadFolderPath', nextState.defaultDownloadFolderPath)
+    storeData('downloadToFolderDirectly', nextState.downloadToFolderDirectly)
+    return nextState
+  }),
 }));
 
 export default useUserSettingfoStore;
