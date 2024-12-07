@@ -1,4 +1,2 @@
 ready to do
-1. store user settings into localStorage
-2. test defaultDownloadFolderPath
-3. unzip srt gzip
+1. support more zippers format
