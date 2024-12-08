@@ -140,14 +140,7 @@ const createWindow = async () => {
               
               const decompressFolder = path.join(saveDir, path.basename(fileName, path.extname(fileName)).replace(/\.*$/, ''));
               
-              // const directory = await unzipper.Open.file(savePath);
-              // await directory.extract({ path: decompressFolder })
               console.log('decompressFolder: ', decompressFolder);
-  
-              // resolve({
-              //   unziped: true,
-              //   savePath: decompressFolder
-              // })
   
               decompressFile(savePath, decompressFolder).then(() => {
                 resolve({
