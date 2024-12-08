@@ -20,7 +20,7 @@ export default function () {
     downloadToFolderDirectly,
     setUserSettingfo,
   } = useUserSettingfoStore();
-  const { data: searchSubtitleValue, mutate: searchSubtitleSync } = useRequest(
+  const { mutate: searchSubtitleSync } = useRequest(
     async (value?: string) => {
       return value || searchValue;
     },
