@@ -25,7 +25,7 @@ export default function () {
       return value || searchValue;
     },
     {
-      debounceWait: 1000,
+      debounceWait: 2000,
       refreshDeps: [searchValue],
     }
   );
