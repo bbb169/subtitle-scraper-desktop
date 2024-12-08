@@ -10,28 +10,26 @@ import * as fs from "node:fs";
 import path from "path";
 import axios from "axios";
 import { DownloadFileResult } from "./type";
-import unzipper from 'unzipper';
-// const decompress = require('decompress');
-// const decompressTar = require('decompress-tar');//.tar
-// const decompressTarbz2 = require('decompress-tarbz2'); // .bz2
-// const decompressTargz = require('decompress-targz'); // .gz
-// const decompressUnzip = require('decompress-unzip'); // .zip
+const decompress = require('decompress');
+const decompressTar = require('decompress-tar');//.tar
+const decompressTarbz2 = require('decompress-tarbz2'); // .bz2
+const decompressTargz = require('decompress-targz'); // .gz
+const decompressUnzip = require('decompress-unzip'); // .zip
 // 常见压缩包后缀
 const compressedExtensions = ['.zip', '.rar', '.7z', '.tar', '.gz', '.bz2'];
 
 
-// const plugins = [
-//   decompressTar(),
-//   decompressTarbz2(),
-//   decompressTargz(),
-//   decompressUnzip(),
-// ];
+const plugins = [
+  decompressTar(),
+  decompressTarbz2(),
+  decompressTargz(),
+  decompressUnzip(),
+];
 
-// // 识别并解压压缩包
-// function decompressFile(inputFile: string, outputDir: string) {
-//   return decompress(inputFile, outputDir, { plugins }) as Promise<any>
-// }
-
+// 识别并解压压缩包
+function decompressFile(inputFile: string, outputDir: string) {
+  return decompress(inputFile, outputDir, { plugins,  }) as Promise<any>
+}
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require("electron-squirrel-startup")) {
@@ -90,7 +88,6 @@ const createWindow = async () => {
 
       // 提取文件名
       let fileName = '字幕压缩包.rar'; // 从 URL 提取文件名
-      console.log('fileName: ', fileName);
 
       if (!fs.existsSync(saveDir)) {
         fs.mkdirSync(saveDir, { recursive: true });
@@ -113,7 +110,6 @@ const createWindow = async () => {
         'upgrade-insecure-requests': '1',
         'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36'
       } });
-      console.log('response: ', response.headers);
       const contentDisposition = response.headers['content-disposition'];
       if (contentDisposition && contentDisposition.includes('filename=')) {
         fileName = contentDisposition
@@ -130,7 +126,7 @@ const createWindow = async () => {
       const savePath = path.join(saveDir, fileName); // 完整的文件路径
       console.log('savePath: ', savePath);
       // 将响应数据写入文件
-      const writer = fs.createWriteStream(savePath);
+      const writer = fs.createWriteStream(savePath, { encoding: 'utf8' });
       response.data.pipe(writer);
   
       // 返回一个 Promise，以便在写入完成后继续执行
@@ -142,25 +138,25 @@ const createWindow = async () => {
               console.log('文件是压缩包，正在解压缩...', extension);
   
               
-              const decompressFolder = path.join(saveDir, path.basename(fileName, `.${path.extname(fileName)}`));
+              const decompressFolder = path.join(saveDir, path.basename(fileName, path.extname(fileName)).replace(/\.*$/, ''));
               
-              const directory = await unzipper.Open.file(savePath);
-              await directory.extract({ path: decompressFolder })
+              // const directory = await unzipper.Open.file(savePath);
+              // await directory.extract({ path: decompressFolder })
               console.log('decompressFolder: ', decompressFolder);
   
-              resolve({
-                unziped: true,
-                savePath: decompressFolder
-              })
-  
-              // decompressFile(savePath, decompressFolder).then(() => {
-              //   resolve({
-              //     unziped: true,
-              //     savePath: saveDir
-              //   })
-              // }).catch(err => {
-              //   reject(err)
+              // resolve({
+              //   unziped: true,
+              //   savePath: decompressFolder
               // })
+  
+              decompressFile(savePath, decompressFolder).then(() => {
+                resolve({
+                  unziped: true,
+                  savePath: decompressFolder
+                })
+              }).catch(err => {
+                reject(err)
+              })
             } else {
               resolve({
                 unziped: false,
