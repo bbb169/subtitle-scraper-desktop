@@ -12,7 +12,6 @@ import axios from "axios";
 import { DownloadFileResult } from "./type";
 import sevenBin from '7zip-bin';
 import { extractFull } from 'node-7z';
-import { detect } from "chardet";
 import { decode } from "iconv-lite";
 
 const pathTo7zip = sevenBin.path7za;
