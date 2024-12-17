@@ -116,6 +116,10 @@ const createWindow = async () => {
           .split('filename=')[1]
           .split(';')[0]
           .replace(/"/g, '');
+
+        // encoding the most possible filename
+        fileName = decode(Buffer.from(fileName, 'latin1'), 'utf-8')
+        console.log('fileName: ', fileName);
       } else {
         // 尝试从 URL 提取文件名
         const urlPath = new URL(fileUrl).pathname;
@@ -126,7 +130,7 @@ const createWindow = async () => {
       const savePath = path.join(saveDir, fileName); // 完整的文件路径
       console.log('savePath: ', savePath);
       // 将响应数据写入文件
-      const writer = fs.createWriteStream(savePath, { encoding: 'utf8' });
+      const writer = fs.createWriteStream(savePath, { encoding: 'utf-8' });
       response.data.pipe(writer);
   
       // 返回一个 Promise，以便在写入完成后继续执行
@@ -142,7 +146,7 @@ const createWindow = async () => {
               
               console.log('decompressFolder: ', decompressFolder);
   
-              decompressFile(savePath, decompressFolder).then(() => {
+              decompressFile(savePath, decompressFolder, extension).then(() => {
                 resolve({
                   unziped: true,
                   savePath: decompressFolder
