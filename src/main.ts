@@ -10,6 +10,13 @@ import * as fs from "node:fs";
 import path from "path";
 import axios from "axios";
 import { DownloadFileResult } from "./type";
+import sevenBin from '7zip-bin';
+import { extractFull } from 'node-7z';
+import { detect } from "chardet";
+import { decode } from "iconv-lite";
+
+const pathTo7zip = sevenBin.path7za;
+
 const decompress = require('decompress');
 const decompressTar = require('decompress-tar');//.tar
 const decompressTarbz2 = require('decompress-tarbz2'); // .bz2
@@ -27,8 +34,25 @@ const plugins = [
 ];
 
 // 识别并解压压缩包
-function decompressFile(inputFile: string, outputDir: string) {
-  return decompress(inputFile, outputDir, { plugins,  }) as Promise<any>
+function decompressFile(inputFile: string, outputDir: string, extensionName?: string) {
+  switch (extensionName) {
+    case '.7z':
+      return new Promise<void>((resolve, reject) => {
+        const myStream = extractFull(inputFile, outputDir, {
+          $bin: pathTo7zip
+        })
+        console.log('myStream: processing');
+
+        myStream.on('end', function () {
+          console.log('end: ');
+          resolve()
+        })
+        
+        myStream.on('error', (err: any) => reject(err))
+      });
+    default:
+      return decompress(inputFile, outputDir, { plugins,  }) as Promise<void>;
+  }
 }
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
