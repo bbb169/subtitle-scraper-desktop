@@ -10,12 +10,13 @@ import * as fs from "node:fs";
 import path from "path";
 import axios from "axios";
 import { DownloadFileResult } from "./type";
-import sevenBin from '7zip-bin';
-import { extractFull } from 'node-7z';
+
 import { decode } from "iconv-lite";
 
+const sevenBin = require('7zip-bin');
 const pathTo7zip = sevenBin.path7za;
 
+const { extractFull } = require('node-7z');
 const decompress = require('decompress');
 const decompressTar = require('decompress-tar');//.tar
 const decompressTarbz2 = require('decompress-tarbz2'); // .bz2
@@ -47,7 +48,10 @@ function decompressFile(inputFile: string, outputDir: string, extensionName?: st
           resolve()
         })
         
-        myStream.on('error', (err: any) => reject(err))
+        myStream.on('error', (err: any) => {
+          console.log('err: ', err);
+          reject(err)
+        })
       });
     default:
       return decompress(inputFile, outputDir, { plugins,  }) as Promise<void>;
