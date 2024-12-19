@@ -12,10 +12,11 @@ import axios from "axios";
 import { DownloadFileResult } from "./type";
 
 import { decode } from "iconv-lite";
+import * as unrarType  from "node-unrar-js";
 
-const sevenBin = require('7zip-bin');
+const sevenBin = require('7zip-bin'); // 7z
 const pathTo7zip = sevenBin.path7za;
-
+const unrar = require("node-unrar-js") as typeof unrarType; // rar
 const { extractFull } = require('node-7z');
 const decompress = require('decompress');
 const decompressTar = require('decompress-tar');//.tar
@@ -53,6 +54,23 @@ function decompressFile(inputFile: string, outputDir: string, extensionName?: st
           reject(err)
         })
       });
+      case '.rar':
+        return new Promise<void>((resolve, reject) => {
+          const myStream = unrar.createExtractorFromFile({
+            targetPath: outputDir,
+            filepath: inputFile  
+          })
+          console.log('myStream: processing', );
+
+          myStream.then(res => {
+            console.log('res: ');
+            resolve()
+          }).catch(err => {
+            console.log('err: ', err);
+            reject(err)
+          })
+        });
+      
     default:
       return decompress(inputFile, outputDir, { plugins,  }) as Promise<void>;
   }
