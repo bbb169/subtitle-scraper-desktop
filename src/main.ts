@@ -60,11 +60,19 @@ function decompressFile(inputFile: string, outputDir: string, extensionName?: st
             targetPath: outputDir,
             filepath: inputFile  
           })
-          console.log('myStream: processing', );
-
+          console.log('myStream: processing');
           myStream.then(res => {
-            console.log('res: ');
-            resolve()
+            try {
+              const gen = res.extract({ }).files;
+              let item = gen.next();
+              while (!item.done) {
+                  item = gen.next();
+              }
+
+              resolve()
+            } catch (error) {
+              reject(error)
+            }
           }).catch(err => {
             console.log('err: ', err);
             reject(err)
@@ -173,7 +181,7 @@ const createWindow = async () => {
       
       const extension = path.extname(fileName).toLowerCase();
       const savePath = path.join(saveDir, fileName); // 完整的文件路径
-      console.log('savePath: ', savePath);
+      console.log('savePath: ', decode(Buffer.from(savePath, 'latin1'), 'utf-8'));
       // 将响应数据写入文件
       const writer = fs.createWriteStream(savePath, { encoding: 'utf-8' });
       response.data.pipe(writer);
@@ -189,7 +197,7 @@ const createWindow = async () => {
               
               const decompressFolder = path.join(saveDir, path.basename(fileName, path.extname(fileName)).replace(/\.*$/, ''));
               
-              console.log('decompressFolder: ', decompressFolder);
+              console.log('decompressFolder: ', decode(Buffer.from(decompressFolder, 'latin1'), 'utf-8'));
   
               decompressFile(savePath, decompressFolder, extension).then(() => {
                 resolve({
