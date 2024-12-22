@@ -272,7 +272,7 @@ export default forwardRef(function (
       const appendArgs: any[] = [];
 
       // `finnalDownloadPage` downloadFileByRequest = true
-      if (subtitleDomStatus === 'finnalDownloadPage' && ((downloadToFolderDirectly && mergedFilePath) || defaultDownloadFolderPath)) {
+      if (subtitleDomStatus === 'finnalDownloadPage' && (downloadToFolderDirectly && (mergedFilePath  || defaultDownloadFolderPath))) {
         appendArgs.push(true)
       }
 
