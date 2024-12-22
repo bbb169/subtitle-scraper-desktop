@@ -236,7 +236,7 @@ export default forwardRef(function (
   ref: RefObject<HTMLIFrameElement>
 ) {
   const { src } = props;
-  const { filePath } = useFileInfoStore();
+  const { filePath, setFileInfo } = useFileInfoStore();
   const { downloadToFolderDirectly, defaultDownloadFolderPath } = useUserSettingfoStore();
   const subtitleSiteRef = useRef<HTMLWebViewElement>();
   const [subtitleDomStatus, setSubtitleDomStatus] =
@@ -292,6 +292,8 @@ export default forwardRef(function (
               }).catch(err => {
                 message.error(`字幕下载失败：${err}`)
               })
+            } else if (subtitleDomStatus === 'subtitleDetailPage') {
+              setFileInfo({ fileDetailPageUrl: res })
             }
             const allStatus = Object.keys(
               subtitleDomExecuteJsMap
