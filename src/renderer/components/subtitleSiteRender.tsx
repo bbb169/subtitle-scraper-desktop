@@ -292,7 +292,7 @@ export default forwardRef(function (
               }).catch(err => {
                 message.error(`字幕下载失败：${err}`)
               })
-            } else if (subtitleDomStatus === 'subtitleDetailPage') {
+            } else if (subtitleDomStatus === 'viewingSearchList') {
               setFileInfo({ fileDetailPageUrl: res })
             }
             const allStatus = Object.keys(
