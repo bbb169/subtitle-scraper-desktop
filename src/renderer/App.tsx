@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { stringify } from "qs";
 import SubtitleSiteRender from "./components/subtitleSiteRender";
-import { Form, Input, Radio, Space, UploadProps } from "antd";
+import { Button, Form, Input, Radio, Space, UploadProps } from "antd";
 import FileDragger from "./components/fileDragger";
 import { useRequest } from "ahooks";
 import useFileInfoStore from "./store/fileInfo";
@@ -14,7 +14,7 @@ const { Search } = Input;
 export default function () {
   const [searchValue, setSearchValue] = useState<string>("");
 
-  const { resolvedFileName } = useFileInfoStore();
+  const { resolvedFileName, fileDetailPageUrl } = useFileInfoStore();
   const {
     defaultDownloadFolderPath,
     downloadToFolderDirectly,
@@ -96,6 +96,12 @@ export default function () {
           当前默认路径：{defaultDownloadFolderPath}
         </Dragger>
       </Form.Item>
+      {fileDetailPageUrl && <Form.Item
+        key="defaultDownloadFolderPath"
+        label="字幕详情页网址"
+      >
+        <a href={fileDetailPageUrl} target='_blank'>{fileDetailPageUrl}</a>
+      </Form.Item>}
       {searchValue && (
         <SubtitleSiteRender
           src={`https://so.zimuku.org/search?${stringify({

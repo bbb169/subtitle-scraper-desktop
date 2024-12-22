@@ -3,6 +3,7 @@ import { create } from "zustand";
 export interface FileInfo {
   resolvedFileName?: string;
   filePath?: string;
+  fileDetailPageUrl?: string;
   setFileInfo: (value: Omit<FileInfo, 'setFileInfo'>) => void;
 }
 
