@@ -4,7 +4,7 @@ import { UserSettingfo } from "../../type";
 
 // 创建 store
 const useUserSettingfoStore = create<UserSettingfo>((set) => ({
-  downloadToFolderDirectly: getStoreData('downloadToFolderDirectly') || true,
+  downloadToFolderDirectly: getStoreData('downloadToFolderDirectly') ?? true,
   defaultDownloadFolderPath: getStoreData('defaultDownloadFolderPath') || '',
   setUserSettingfo: (value) => set((state) => {
     const nextState = { ...state, ...value };
