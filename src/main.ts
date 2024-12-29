@@ -12,19 +12,21 @@ import axios from "axios";
 import { DownloadFileResult } from "./type";
 
 import { decode } from "iconv-lite";
-import * as unrarType  from "node-unrar-js";
-
-const sevenBin = require('7zip-bin'); // 7z
+import sevenBin from '7zip-bin'; // 7z
 const pathTo7zip = sevenBin.path7za;
-const unrar = require("node-unrar-js") as typeof unrarType; // rar
-const { extractFull } = require('node-7z');
-const decompress = require('decompress');
-const decompressTar = require('decompress-tar');//.tar
-const decompressTarbz2 = require('decompress-tarbz2'); // .bz2
-const decompressTargz = require('decompress-targz'); // .gz
-const decompressUnzip = require('decompress-unzip'); // .zip
+const wasmBinary = fs.readFileSync(require.resolve('node-unrar-js/esm/js/unrar.wasm'));
+import { createExtractorFromFile } from 'node-unrar-js/esm'; // rar
+import { extractFull } from 'node-7z';
+import decompress from 'decompress';
+import decompressTar from 'decompress-tar';//.tar
+import decompressTarbz2 from 'decompress-tarbz2'; // .bz2
+import decompressTargz from 'decompress-targz'; // .gz
+import decompressUnzip from 'decompress-unzip'; // .zip
+
 // 常见压缩包后缀
 const compressedExtensions = ['.zip', '.rar', '.7z', '.tar', '.gz', '.bz2'];
+// eslint-disable-next-line import/namespace
+console.log('unrar: ', createExtractorFromFile);
 
 
 const plugins = [
@@ -39,10 +41,12 @@ function decompressFile(inputFile: string, outputDir: string, extensionName?: st
   switch (extensionName) {
     case '.7z':
       return new Promise<void>((resolve, reject) => {
+        console.log('myStream: started', extensionName);
+
         const myStream = extractFull(inputFile, outputDir, {
           $bin: pathTo7zip
         })
-        console.log('myStream: processing');
+        console.log('myStream: processing', extensionName);
 
         myStream.on('end', function () {
           console.log('end: ');
@@ -56,11 +60,14 @@ function decompressFile(inputFile: string, outputDir: string, extensionName?: st
       });
       case '.rar':
         return new Promise<void>((resolve, reject) => {
-          const myStream = unrar.createExtractorFromFile({
+          console.log('myStream: started', extensionName);
+          // eslint-disable-next-line import/namespace
+          const myStream = createExtractorFromFile({
             targetPath: outputDir,
-            filepath: inputFile  
+            filepath: inputFile,
+            wasmBinary
           })
-          console.log('myStream: processing');
+          console.log('myStream: processing', extensionName);
           myStream.then(res => {
             try {
               const gen = res.extract({ }).files;
@@ -80,7 +87,7 @@ function decompressFile(inputFile: string, outputDir: string, extensionName?: st
         });
       
     default:
-      return decompress(inputFile, outputDir, { plugins,  }) as Promise<void>;
+      return decompress(inputFile, outputDir, { plugins,  }) as unknown as Promise<void>;
   }
 }
 
