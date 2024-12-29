@@ -18,5 +18,9 @@ declare namespace NodeJS {
 }
 declare const MAIN_WINDOW_VITE_DEV_SERVER_URL: string;
 declare module 'vite-plugin-copy';
+declare module 'decompress-tarbz2';
+declare module 'decompress-targz';
+declare module 'decompress-unzip';
+declare module 'decompress-tar';
 
 export {}

@@ -9,7 +9,6 @@ import { FusesPlugin } from '@electron-forge/plugin-fuses';
 import { FuseV1Options, FuseVersion } from '@electron/fuses';
 // import { viteStaticCopy } from 'vite-plugin-static-copy';
 
-
 const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
