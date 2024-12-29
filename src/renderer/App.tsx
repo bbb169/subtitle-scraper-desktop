@@ -20,12 +20,12 @@ export default function () {
     downloadToFolderDirectly,
     setUserSettingfo,
   } = useUserSettingfoStore();
-  const { mutate: searchSubtitleSync } = useRequest(
+  const { mutate: searchSubtitleSync, data: mergedSearchValue } = useRequest(
     async (value?: string) => {
       return value || searchValue;
     },
     {
-      debounceWait: 2000,
+      debounceWait: 1000,
       refreshDeps: [searchValue],
     }
   );
@@ -97,15 +97,15 @@ export default function () {
         </Dragger>
       </Form.Item>
       {fileDetailPageUrl && <Form.Item
-        key="defaultDownloadFolderPath"
+        key="subtitleDetailLink"
         label="字幕详情页网址"
       >
         <a href={fileDetailPageUrl} target='_blank'>{fileDetailPageUrl}</a>
       </Form.Item>}
-      {searchValue && (
+      {mergedSearchValue && (
         <SubtitleSiteRender
           src={`https://so.zimuku.org/search?${stringify({
-            q: searchValue,
+            q: mergedSearchValue,
             chost: "zimuku.org",
           })}`}
         />
