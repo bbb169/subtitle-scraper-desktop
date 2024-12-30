@@ -12,8 +12,6 @@ import { DownloadFileResult } from "./type";
 
 import { decode } from "iconv-lite";
 import sevenBin from '7zip-bin'; // 7z
-const pathTo7zip = sevenBin.path7za;
-const wasmBinary = fs.readFileSync(require.resolve('node-unrar-js/esm/js/unrar.wasm'));
 import { createExtractorFromFile } from 'node-unrar-js/esm'; // rar
 import { extractFull } from 'node-7z';
 import decompress from 'decompress';
@@ -22,6 +20,8 @@ import decompressTarbz2 from 'decompress-tarbz2'; // .bz2
 import decompressTargz from 'decompress-targz'; // .gz
 import decompressUnzip from 'decompress-unzip'; // .zip
 
+const pathTo7zip = sevenBin.path7za;
+const wasmBinary = fs.readFileSync(require.resolve('node-unrar-js/esm/js/unrar.wasm'));
 // 常见压缩包后缀
 const compressedExtensions = ['.zip', '.rar', '.7z', '.tar', '.gz', '.bz2'];
 // eslint-disable-next-line import/namespace
