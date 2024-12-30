@@ -13,11 +13,4 @@ declare global {
   }
 }
 
-declare namespace NodeJS {
-  interface Global {
-    MAIN_WINDOW_VITE_DEV_SERVER_URL: string; // 声明全局变量
-  }
-}
-declare const MAIN_WINDOW_VITE_DEV_SERVER_URL: string;
-
 export {}
