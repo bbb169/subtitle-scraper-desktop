@@ -59,7 +59,14 @@ export default function () {
           setSearchValue(evt.target.value);
         }}
         onSearch={(value) => {
-          searchSubtitleSync(value);
+          if (mergedSearchValue === value) {
+            searchSubtitleSync();
+            setTimeout(() => {
+              searchSubtitleSync(value);
+            }, 1000);
+          } else {
+            searchSubtitleSync(value);
+          }
         }}
         enterButton
       />
