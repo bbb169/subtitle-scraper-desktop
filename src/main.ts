@@ -21,7 +21,6 @@ import decompressTargz from 'decompress-targz'; // .gz
 import decompressUnzip from 'decompress-unzip'; // .zip
 
 const pathTo7zip = sevenBin.path7za;
-const wasmBinary = fs.readFileSync(require.resolve('node-unrar-js/esm/js/unrar.wasm'));
 // 常见压缩包后缀
 const compressedExtensions = ['.zip', '.rar', '.7z', '.tar', '.gz', '.bz2'];
 // eslint-disable-next-line import/namespace
@@ -64,7 +63,6 @@ function decompressFile(inputFile: string, outputDir: string, extensionName?: st
           const myStream = createExtractorFromFile({
             targetPath: outputDir,
             filepath: inputFile,
-            wasmBinary
           })
           console.log('myStream: processing', extensionName);
           myStream.then(res => {
