@@ -13,6 +13,9 @@ const api: PreloadAPITypes = {
   },
   async downloadFile(fileUrl: string, savePath: string) {
     return await ipcRenderer.invoke('downloadFile', fileUrl, savePath)
+  },
+  async openDirectory() {
+    return ipcRenderer.invoke('openDirectory')
   }
 }
 

@@ -231,6 +231,12 @@ const createWindow = async () => {
       throw error;
     }
   });
+
+  ipcMain.handle("openDirectory", async () => {
+    return await dialog.showOpenDialog(mainWindow, {
+      properties: ['openDirectory']
+    });
+  });
 };
 
 // This method will be called when Electron has finished
