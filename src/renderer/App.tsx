@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { stringify } from "qs";
 import SubtitleSiteRender from "./components/subtitleSiteRender";
-import { Button, Form, Input, Radio, Space, UploadProps } from "antd";
+import { Button, Form, Input, message, Radio, Space, Upload, UploadProps } from "antd";
 import FileDragger from "./components/fileDragger";
 import { useRequest } from "ahooks";
 import useFileInfoStore from "./store/fileInfo";
@@ -91,17 +91,26 @@ export default function () {
         label="直接下载字幕默认目录路径"
       >
         <Dragger
-          {...{
-            directory: true,
-            beforeUpload,
-            customRequest: ({ onSuccess }) => {
-              onSuccess('')
-            }
-          }}
-        >
-          浏览或拖拽目录
-          当前默认路径：{defaultDownloadFolderPath}
-        </Dragger>
+            {...{
+              directory: true,
+              style: { position: 'relative' },
+            }}
+          >
+            <div style={{ width: '100%', height: '100%', position: 'absolute' }} onClick={(evt) => {
+              window.api.openDirectory().then(res => {
+                if (!res.canceled) {
+                  const dirPath = res.filePaths[0];
+
+                  setUserSettingfo({ defaultDownloadFolderPath: dirPath })
+                }
+              }).catch(err => {
+                message.error(`选择失败： ${JSON.stringify(err)}`)
+              })
+              evt.stopPropagation()
+            }}></div>
+            浏览或拖拽目录
+            当前默认路径：{defaultDownloadFolderPath}
+          </Dragger>
       </Form.Item>
       {fileDetailPageUrl && <Form.Item
         key="subtitleDetailLink"
