@@ -19,6 +19,7 @@ import decompressTar from 'decompress-tar';//.tar
 import decompressTarbz2 from 'decompress-tarbz2'; // .bz2
 import decompressTargz from 'decompress-targz'; // .gz
 import decompressUnzip from 'decompress-unzip'; // .zip
+import * as startUp from "electron-squirrel-startup";
 
 const pathTo7zip = sevenBin.path7za;
 // 常见压缩包后缀
@@ -89,7 +90,7 @@ function decompressFile(inputFile: string, outputDir: string, extensionName?: st
 }
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
-if (require("electron-squirrel-startup")) {
+if (startUp?.default) {
   app.quit();
 }
 
