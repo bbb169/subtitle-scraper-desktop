@@ -1,53 +1,44 @@
-import {
-  app,
-  BrowserWindow,
-  dialog,
-  ipcMain,
-  session,
-} from "electron";
+import { app, BrowserWindow, dialog, ipcMain, session } from "electron";
 import * as fs from "node:fs";
 import path from "path";
 import axios from "axios";
 import { DownloadFileResult } from "./type";
 
 import { decode } from "iconv-lite";
-import sevenBin from '7zip-bin'; // 7z
-import { createExtractorFromFile } from 'node-unrar-js/esm'; // rar
-import { extractFull } from 'node-7z';
-import decompress from 'decompress';
-import decompressTar from 'decompress-tar';//.tar
-import decompressTarbz2 from 'decompress-tarbz2'; // .bz2
-import decompressTargz from 'decompress-targz'; // .gz
-import decompressUnzip from 'decompress-unzip'; // .zip
+import sevenBin from "7zip-bin"; // 7z
+import { createExtractorFromFile } from "node-unrar-js/esm"; // rar
+import { extractFull } from "node-7z";
+import decompress from "decompress";
+import decompressTar from "decompress-tar"; //.tar
+import decompressTarbz2 from "decompress-tarbz2"; // .bz2
+import decompressTargz from "decompress-targz"; // .gz
+import decompressUnzip from "decompress-unzip"; // .zip
 import * as startUp from "electron-squirrel-startup";
 import { homedir } from "node:os";
-import * as log from 'electron-log';
+import * as log from "electron-log";
 
 // 配置日志文件路径（可选）
-log.transports.file.resolvePath = () => path.join(homedir(), 'my-electron-app.log');
+log.transports.file.resolvePath = () =>
+  path.join(homedir(), "subtitle-scraper-desktop.log");
+log.error("homedir(): ", homedir());
 
 // 使用日志
-log.info('Application is starting...');
-log.error('An error occurred!');
+log.info("Application is starting...");
+log.error("An error occurred!");
 
 const logInfo = (...params: any[]) => {
-  log.info(...params)
-  console.log(...params)
-}
+  log.info(...params);
+  log.error(...params);
+};
 
 const logError = (...params: any[]) => {
-  log.error(...params)
-  console.error(...params)
-}
-
-
+  log.error(...params);
+  console.error(...params);
+};
 
 const pathTo7zip = sevenBin.path7za;
 // 常见压缩包后缀
-const compressedExtensions = ['.zip', '.rar', '.7z', '.tar', '.gz', '.bz2'];
-// eslint-disable-next-line import/namespace
-logInfo('unrar: ', createExtractorFromFile);
-
+const compressedExtensions = [".zip", ".rar", ".7z", ".tar", ".gz", ".bz2"];
 
 const plugins = [
   decompressTar(),
@@ -57,56 +48,64 @@ const plugins = [
 ];
 
 // 识别并解压压缩包
-function decompressFile(inputFile: string, outputDir: string, extensionName?: string) {
+function decompressFile(
+  inputFile: string,
+  outputDir: string,
+  extensionName?: string
+) {
   switch (extensionName) {
-    case '.7z':
+    case ".7z":
       return new Promise<void>((resolve, reject) => {
-        logInfo('myStream: started', extensionName);
+        logInfo("myStream: started", extensionName);
 
         const myStream = extractFull(inputFile, outputDir, {
-          $bin: pathTo7zip
-        })
-        logInfo('myStream: processing', extensionName);
+          $bin: pathTo7zip,
+        });
+        logInfo("myStream: processing", extensionName);
 
-        myStream.on('end', function () {
-          logInfo('end: ');
-          resolve()
-        })
-        
-        myStream.on('error', (err: any) => {
-          logInfo('err: ', err);
-          reject(err)
-        })
+        myStream.on("end", function () {
+          logInfo("end: ");
+          resolve();
+        });
+
+        myStream.on("error", (err: any) => {
+          logInfo("err: ", err);
+          reject(err);
+        });
       });
-      case '.rar':
-        return new Promise<void>((resolve, reject) => {
-          logInfo('myStream: started', extensionName);
-          // eslint-disable-next-line import/namespace
-          const myStream = createExtractorFromFile({
-            targetPath: outputDir,
-            filepath: inputFile,
-          })
-          logInfo('myStream: processing', extensionName);
-          myStream.then(res => {
+    case ".rar":
+      return new Promise<void>((resolve, reject) => {
+        logInfo("myStream: started", extensionName);
+        // eslint-disable-next-line import/namespace
+        const myStream = createExtractorFromFile({
+          targetPath: outputDir,
+          filepath: inputFile,
+        });
+        logInfo("myStream: processing", extensionName);
+        myStream
+          .then((res) => {
             try {
-              const gen = res.extract({ }).files;
+              const gen = res.extract({}).files;
               let item = gen.next();
               while (!item.done) {
-                  item = gen.next();
+                item = gen.next();
               }
 
-              resolve()
+              resolve();
             } catch (error) {
-              reject(error)
+              reject(error);
             }
-          }).catch(err => {
-            logInfo('err: ', err);
-            reject(err)
           })
-        });
-      
+          .catch((err) => {
+            logInfo("err: ", err);
+            reject(err);
+          });
+      });
+
     default:
-      return decompress(inputFile, outputDir, { plugins,  }) as unknown as Promise<void>;
+      return decompress(inputFile, outputDir, {
+        plugins,
+      }) as unknown as Promise<void>;
   }
 }
 
@@ -162,101 +161,131 @@ const createWindow = async () => {
     return fs;
   });
 
-  ipcMain.handle("downloadFile", async (_, fileUrl: string, saveDir: string) => {
-    try {
-      logInfo('savePath: ',fileUrl, saveDir);
+  ipcMain.handle(
+    "downloadFile",
+    async (_, fileUrl: string, saveDir: string) => {
+      try {
+        logInfo("savePath: ", fileUrl, saveDir);
 
-      // 提取文件名
-      let fileName = '字幕压缩包.rar'; // 从 URL 提取文件名
+        // 提取文件名
+        let fileName = "字幕压缩包.rar"; // 从 URL 提取文件名
 
-      if (!fs.existsSync(saveDir)) {
-        fs.mkdirSync(saveDir, { recursive: true });
-      }
-  
-      // 使用 axios 发起 GET 请求，并指定响应类型为流
-      const response = await axios.get(fileUrl, { responseType: 'stream', headers: {
-        'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-        'accept-encoding': 'gzip, deflate, br, zstd',
-        'accept-language': 'zh-CN,zh;q=0.9,en;q=0.8,en-US;q=0.7',
-        'connection': 'keep-alive',
-        'host': 'zimuku.org',
-        'sec-ch-ua': '"Google Chrome";v="131", "Chromium";v="131", "Not_A Brand";v="24"',
-        'sec-ch-ua-mobile': '?0',
-        'sec-ch-ua-platform': '"Windows"',
-        'sec-fetch-dest': 'document',
-        'sec-fetch-mode': 'navigate',
-        'sec-fetch-site': 'same-origin',
-        'sec-fetch-user': '?1',
-        'upgrade-insecure-requests': '1',
-        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36'
-      } });
-      const contentDisposition = response.headers['content-disposition'];
-      if (contentDisposition && contentDisposition.includes('filename=')) {
-        fileName = contentDisposition
-          .split('filename=')[1]
-          .split(';')[0]
-          .replace(/"/g, '');
+        if (!fs.existsSync(saveDir)) {
+          logInfo('starting make dir');
 
-        // encoding the most possible filename
-        fileName = decode(Buffer.from(fileName, 'latin1'), 'utf-8')
-        logInfo('fileName: ', fileName);
-      } else {
-        // 尝试从 URL 提取文件名
-        const urlPath = new URL(fileUrl).pathname;
-        fileName = path.basename(urlPath) || fileName;
-      }
-      
-      const extension = path.extname(fileName).toLowerCase();
-      const savePath = path.join(saveDir, fileName); // 完整的文件路径
-      logInfo('savePath: ', decode(Buffer.from(savePath, 'latin1'), 'utf-8'));
-      // 将响应数据写入文件
-      const writer = fs.createWriteStream(savePath, { encoding: 'utf-8' });
-      response.data.pipe(writer);
-  
-      // 返回一个 Promise，以便在写入完成后继续执行
-      return new Promise<DownloadFileResult>((resolve, reject) => {
-        writer.on('finish', async () => {
-          logInfo(`文件已成功下载到: ${savePath}`, extension);
-          try {
-            if (compressedExtensions.includes(extension)) {
-              logInfo('文件是压缩包，正在解压缩...', extension);
-  
-              
-              const decompressFolder = path.join(saveDir, path.basename(fileName, path.extname(fileName)).replace(/\.*$/, ''));
-              
-              logInfo('decompressFolder: ', decode(Buffer.from(decompressFolder, 'latin1'), 'utf-8'));
-  
-              decompressFile(savePath, decompressFolder, extension).then(() => {
+          fs.mkdirSync(saveDir, { recursive: true });
+        }
+        logInfo('starting request');
+
+        axios.get('https://github.com').then(res => {
+          logInfo('success');
+          
+        })
+
+        // 使用 axios 发起 GET 请求，并指定响应类型为流
+        const response = await axios.get(fileUrl, {
+          responseType: "stream",
+          // headers: {
+          //   accept:
+          //     "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+          //   "accept-encoding": "gzip, deflate, br, zstd",
+          //   "accept-language": "zh-CN,zh;q=0.9,en;q=0.8,en-US;q=0.7",
+          //   connection: "keep-alive",
+          //   host: "zimuku.org",
+          //   "sec-ch-ua":
+          //     '"Google Chrome";v="131", "Chromium";v="131", "Not_A Brand";v="24"',
+          //   "sec-ch-ua-mobile": "?0",
+          //   "sec-ch-ua-platform": '"Windows"',
+          //   "sec-fetch-dest": "document",
+          //   "sec-fetch-mode": "navigate",
+          //   "sec-fetch-site": "same-origin",
+          //   "sec-fetch-user": "?1",
+          //   "upgrade-insecure-requests": "1",
+          //   "user-agent":
+          //     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+          // },
+          timeout: 10000,
+        });
+        const contentDisposition = response.headers["content-disposition"];
+        if (contentDisposition && contentDisposition.includes("filename=")) {
+          fileName = contentDisposition
+            .split("filename=")[1]
+            .split(";")[0]
+            .replace(/"/g, "");
+
+          // encoding the most possible filename
+          fileName = decode(Buffer.from(fileName, "latin1"), "utf-8");
+          logInfo("fileName: ", fileName);
+        } else {
+          // 尝试从 URL 提取文件名
+          const urlPath = new URL(fileUrl).pathname;
+          fileName = path.basename(urlPath) || fileName;
+        }
+
+        const extension = path.extname(fileName).toLowerCase();
+        const savePath = path.join(saveDir, fileName); // 完整的文件路径
+        logInfo(
+          "downloaded: ",
+          decode(Buffer.from(savePath, "latin1"), "utf-8")
+        );
+        // 将响应数据写入文件
+        const writer = fs.createWriteStream(savePath, { encoding: "utf-8" });
+        response.data.pipe(writer);
+
+        // 返回一个 Promise，以便在写入完成后继续执行
+        return new Promise<DownloadFileResult>((resolve, reject) => {
+          writer.on("finish", async () => {
+            logInfo(`文件已成功下载到: ${savePath}`, extension);
+            try {
+              if (compressedExtensions.includes(extension)) {
+                logInfo("文件是压缩包，正在解压缩...", extension);
+
+                const decompressFolder = path.join(
+                  saveDir,
+                  path
+                    .basename(fileName, path.extname(fileName))
+                    .replace(/\.*$/, "")
+                );
+
+                logInfo(
+                  "decompressFolder: ",
+                  decode(Buffer.from(decompressFolder, "latin1"), "utf-8")
+                );
+
+                decompressFile(savePath, decompressFolder, extension)
+                  .then(() => {
+                    resolve({
+                      unziped: true,
+                      savePath: decompressFolder,
+                    });
+                  })
+                  .catch((err) => {
+                    reject(err);
+                  });
+              } else {
                 resolve({
-                  unziped: true,
-                  savePath: decompressFolder
-                })
-              }).catch(err => {
-                reject(err)
-              })
-            } else {
-              resolve({
-                unziped: false,
-                savePath,
-              });
+                  unziped: false,
+                  savePath,
+                });
+              }
+            } catch (error) {
+              reject(error);
             }
-          } catch (error) {
-            reject(error)
-          }
+          });
+          writer.on("error", (err) => {
+            reject(err);
+          });
         });
-        writer.on('error', (err) => {
-          reject(err);
-        });
-      });
-    } catch (error) {
-      logError(`下载文件时出错: ${error.message}`);
-      throw error;
+      } catch (error) {
+        logError(`下载文件时出错: ${error.message}`);
+        throw error;
+      }
     }
-  });
+  );
 
   ipcMain.handle("openDirectory", async () => {
     return await dialog.showOpenDialog(mainWindow, {
-      properties: ['openDirectory']
+      properties: ["openDirectory"],
     });
   });
 };
@@ -265,7 +294,7 @@ const createWindow = async () => {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on("ready", () => {
-  createWindow()
+  createWindow();
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common
