@@ -20,12 +20,23 @@ import decompressTarbz2 from 'decompress-tarbz2'; // .bz2
 import decompressTargz from 'decompress-targz'; // .gz
 import decompressUnzip from 'decompress-unzip'; // .zip
 import * as startUp from "electron-squirrel-startup";
+import { homedir } from "node:os";
+import * as log from 'electron-log';
+
+// 配置日志文件路径（可选）
+log.transports.file.resolvePath = () => path.join(homedir(), 'my-electron-app.log');
+
+// 使用日志
+log.info('Application is starting...');
+log.error('An error occurred!');
+
+
 
 const pathTo7zip = sevenBin.path7za;
 // 常见压缩包后缀
 const compressedExtensions = ['.zip', '.rar', '.7z', '.tar', '.gz', '.bz2'];
 // eslint-disable-next-line import/namespace
-console.log('unrar: ', createExtractorFromFile);
+log.info('unrar: ', createExtractorFromFile);
 
 
 const plugins = [
@@ -40,32 +51,32 @@ function decompressFile(inputFile: string, outputDir: string, extensionName?: st
   switch (extensionName) {
     case '.7z':
       return new Promise<void>((resolve, reject) => {
-        console.log('myStream: started', extensionName);
+        log.info('myStream: started', extensionName);
 
         const myStream = extractFull(inputFile, outputDir, {
           $bin: pathTo7zip
         })
-        console.log('myStream: processing', extensionName);
+        log.info('myStream: processing', extensionName);
 
         myStream.on('end', function () {
-          console.log('end: ');
+          log.info('end: ');
           resolve()
         })
         
         myStream.on('error', (err: any) => {
-          console.log('err: ', err);
+          log.info('err: ', err);
           reject(err)
         })
       });
       case '.rar':
         return new Promise<void>((resolve, reject) => {
-          console.log('myStream: started', extensionName);
+          log.info('myStream: started', extensionName);
           // eslint-disable-next-line import/namespace
           const myStream = createExtractorFromFile({
             targetPath: outputDir,
             filepath: inputFile,
           })
-          console.log('myStream: processing', extensionName);
+          log.info('myStream: processing', extensionName);
           myStream.then(res => {
             try {
               const gen = res.extract({ }).files;
@@ -79,7 +90,7 @@ function decompressFile(inputFile: string, outputDir: string, extensionName?: st
               reject(error)
             }
           }).catch(err => {
-            console.log('err: ', err);
+            log.info('err: ', err);
             reject(err)
           })
         });
@@ -143,7 +154,7 @@ const createWindow = async () => {
 
   ipcMain.handle("downloadFile", async (_, fileUrl: string, saveDir: string) => {
     try {
-      console.log('savePath: ',fileUrl, saveDir);
+      log.info('savePath: ',fileUrl, saveDir);
 
       // 提取文件名
       let fileName = '字幕压缩包.rar'; // 从 URL 提取文件名
@@ -178,7 +189,7 @@ const createWindow = async () => {
 
         // encoding the most possible filename
         fileName = decode(Buffer.from(fileName, 'latin1'), 'utf-8')
-        console.log('fileName: ', fileName);
+        log.info('fileName: ', fileName);
       } else {
         // 尝试从 URL 提取文件名
         const urlPath = new URL(fileUrl).pathname;
@@ -187,7 +198,7 @@ const createWindow = async () => {
       
       const extension = path.extname(fileName).toLowerCase();
       const savePath = path.join(saveDir, fileName); // 完整的文件路径
-      console.log('savePath: ', decode(Buffer.from(savePath, 'latin1'), 'utf-8'));
+      log.info('savePath: ', decode(Buffer.from(savePath, 'latin1'), 'utf-8'));
       // 将响应数据写入文件
       const writer = fs.createWriteStream(savePath, { encoding: 'utf-8' });
       response.data.pipe(writer);
@@ -195,15 +206,15 @@ const createWindow = async () => {
       // 返回一个 Promise，以便在写入完成后继续执行
       return new Promise<DownloadFileResult>((resolve, reject) => {
         writer.on('finish', async () => {
-          console.log(`文件已成功下载到: ${savePath}`, extension);
+          log.info(`文件已成功下载到: ${savePath}`, extension);
           try {
             if (compressedExtensions.includes(extension)) {
-              console.log('文件是压缩包，正在解压缩...', extension);
+              log.info('文件是压缩包，正在解压缩...', extension);
   
               
               const decompressFolder = path.join(saveDir, path.basename(fileName, path.extname(fileName)).replace(/\.*$/, ''));
               
-              console.log('decompressFolder: ', decode(Buffer.from(decompressFolder, 'latin1'), 'utf-8'));
+              log.info('decompressFolder: ', decode(Buffer.from(decompressFolder, 'latin1'), 'utf-8'));
   
               decompressFile(savePath, decompressFolder, extension).then(() => {
                 resolve({
@@ -228,7 +239,7 @@ const createWindow = async () => {
         });
       });
     } catch (error) {
-      console.error(`下载文件时出错: ${error.message}`);
+      log.error(`下载文件时出错: ${error.message}`);
       throw error;
     }
   });
