@@ -2,7 +2,6 @@ import { app, BrowserWindow, dialog, ipcMain, session } from "electron";
 import * as electron from 'electron';
 import * as fs from "node:fs";
 import path from "path";
-import axios from "axios";
 import { DownloadFileResult } from "./type";
 
 import { decode } from "iconv-lite";
@@ -15,10 +14,8 @@ import decompressTarbz2 from "decompress-tarbz2"; // .bz2
 import decompressTargz from "decompress-targz"; // .gz
 import decompressUnzip from "decompress-unzip"; // .zip
 import * as startUp from "electron-squirrel-startup";
-// import {bootstrap} from 'global-agent';
 import { homedir } from "node:os";
 import * as log from "electron-log";
-// bootstrap();
 
 
 // 配置日志文件路径（可选）
@@ -185,36 +182,9 @@ const createWindow = async () => {
         }
         logInfo('starting request', fileUrl);
 
-        // net.fetch(fileUrl).then(res => {
-        //   console.log('res: ', 'res');
-
-        // }).catch(err => {
-        //   console.log('err: ', 'err');
-
-        // })
-
         const request = () => new Promise<Electron.IncomingMessage>((resolve, reject) => {
           const requ = electron.net.request({
             url: fileUrl,
-            // headers: {
-            //   accept:
-            //     "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-            //   "accept-encoding": "gzip, deflate, br, zstd",
-            //   "accept-language": "zh-CN,zh;q=0.9,en;q=0.8,en-US;q=0.7",
-            //   connection: "keep-alive",
-            //   host: "zimuku.org",
-            //   "sec-ch-ua":
-            //     '"Google Chrome";v="131", "Chromium";v="131", "Not_A Brand";v="24"',
-            //   "sec-ch-ua-mobile": "?0",
-            //   "sec-ch-ua-platform": '"Windows"',
-            //   "sec-fetch-dest": "document",
-            //   "sec-fetch-mode": "navigate",
-            //   "sec-fetch-site": "same-origin",
-            //   "sec-fetch-user": "?1",
-            //   "upgrade-insecure-requests": "1",
-            //   "user-agent":
-            //     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
-            // },
           })
           requ.on('abort', () => {
             console.log('abort: ', 'abort');
@@ -223,54 +193,15 @@ const createWindow = async () => {
           requ.on('response', (response) => {
             resolve(response)
             logInfo('response: ', response);
-            // res.on('data', () => {
-            //   logInfo('data: ', 'data');
-  
-            // })
-            // res.on('end', () => {
-            //   logInfo('res: ', 'end');
-            // })
           })
           requ.on('error', (err) => {
             logInfo('error: ', err);
             reject(err)
   
           });
-          // requ.on('close', () => {
-          //   logInfo('close: ',1321 );
-  
-          // });
-          // requ.addListener('response', (res) => {
-          //   console.log('response: ', 'res');
-  
-          // })
           requ.end();
         })
 
-        // 使用 axios 发起 GET 请求，并指定响应类型为流
-        // const response = await axios.get(fileUrl, {
-        //   responseType: "stream",
-        //   headers: {
-        //     accept:
-        //       "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-        //     "accept-encoding": "gzip, deflate, br, zstd",
-        //     "accept-language": "zh-CN,zh;q=0.9,en;q=0.8,en-US;q=0.7",
-        //     connection: "keep-alive",
-        //     host: "zimuku.org",
-        //     "sec-ch-ua":
-        //       '"Google Chrome";v="131", "Chromium";v="131", "Not_A Brand";v="24"',
-        //     "sec-ch-ua-mobile": "?0",
-        //     "sec-ch-ua-platform": '"Windows"',
-        //     "sec-fetch-dest": "document",
-        //     "sec-fetch-mode": "navigate",
-        //     "sec-fetch-site": "same-origin",
-        //     "sec-fetch-user": "?1",
-        //     "upgrade-insecure-requests": "1",
-        //     "user-agent":
-        //       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
-        //   },
-        //   timeout: 10000,
-        // });
         const response = await request();
         const contentDisposition = response.headers["content-disposition"];
         if (contentDisposition && contentDisposition.includes("filename=")) {
@@ -363,8 +294,7 @@ const createWindow = async () => {
         });
       } catch (error) {
         logError(`下载文件时出错: ${error.message}`);
-        // logError(`下载文件时出错: `);
-        // throw error;
+        throw error;
       }
     }
   );
