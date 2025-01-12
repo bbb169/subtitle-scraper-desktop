@@ -187,7 +187,7 @@ const createWindow = async () => {
             url: fileUrl,
           })
           requ.on('abort', () => {
-            console.log('abort: ', 'abort');
+            logInfo('abort: ', 'abort');
   
           })
           requ.on('response', (response) => {
@@ -205,7 +205,7 @@ const createWindow = async () => {
         const response = await request();
         const contentDisposition = response.headers["content-disposition"];
         if (contentDisposition && contentDisposition.includes("filename=")) {
-          console.log('contentDisposition: ', contentDisposition);
+          logInfo('contentDisposition: ', contentDisposition);
           fileName = (contentDisposition as string)
             .split("filename=")[1]
             .split(";")[0]
@@ -230,13 +230,13 @@ const createWindow = async () => {
         const writer = fs.createWriteStream(savePath, { encoding: "utf-8" });
 
         response.on('data', (chunk) => {
-          console.log('data: ', 'data');
+          logInfo('data: ', 'data');
           writer.write(chunk);
         });
   
         response.on('end', () => {
           writer.end();
-          console.log('File downloaded successfully!');
+          logInfo('File downloaded successfully!');
         });
 
         response.on('error', (err) => {
@@ -312,7 +312,7 @@ const createWindow = async () => {
 app.on("ready", () => {
   session.defaultSession.setCertificateVerifyProc((request, callback) => {
     // 强制信任特定的 URL
-    console.log('request.hostname: ', request.hostname);
+    logInfo('request.hostname: ', request.hostname);
 
     if (request.hostname === 'zimuku.org') {
       return callback(0); // 0 表示忽略错误，信任证书
