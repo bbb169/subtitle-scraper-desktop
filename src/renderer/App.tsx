@@ -1,14 +1,13 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { stringify } from "qs";
 import SubtitleSiteRender from "./components/subtitleSiteRender";
-import { Button, Form, Input, message, Radio, Space, Upload, UploadProps } from "antd";
+import { Form, Input, message, Radio, Space } from "antd";
 import FileDragger from "./components/fileDragger";
 import { useRequest } from "ahooks";
 import useFileInfoStore from "./store/fileInfo";
 import useUserSettingfoStore from "./store/userSetting";
 import Dragger from "antd/es/upload/Dragger";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const { webUtils } = require("electron");
 const { Search } = Input;
 
 export default function () {
@@ -34,21 +33,6 @@ export default function () {
     setSearchValue(resolvedFileName);
     searchSubtitleSync(resolvedFileName);
   }, [resolvedFileName]);
-
-  const { run: beforeUpload } = useRequest<ReturnType<UploadProps['beforeUpload']>, Parameters<UploadProps['beforeUpload']>>(((file, fileList) => {
-    return new Promise<void>((resolve, reject) => {
-      const filePath = webUtils
-                .getPathForFile(file as any)
-                ?.split("\\")
-                .slice(0, -1)
-                .join("\\");
-              console.log("file: ", filePath);
-
-      setUserSettingfo({ defaultDownloadFolderPath: filePath })
-
-      reject();
-    })
-  }), { throttleWait: 1000, throttleLeading: true, throttleTrailing: false, manual: true })
 
   return (
     <Space direction="vertical" style={{ width: "100%" }}>

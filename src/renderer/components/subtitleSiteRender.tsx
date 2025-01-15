@@ -1,7 +1,6 @@
 import {
   forwardRef,
   IframeHTMLAttributes,
-  RefObject,
   useEffect,
   useRef,
   useState,
@@ -233,7 +232,6 @@ type SUBTITLE_DOM_STATUS = keyof typeof subtitleDomExecuteJsMap;
 
 export default forwardRef(function (
   props: IframeHTMLAttributes<any>,
-  ref: RefObject<HTMLIFrameElement>
 ) {
   const { src } = props;
   const { filePath, setFileInfo } = useFileInfoStore();

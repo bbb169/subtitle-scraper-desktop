@@ -3,7 +3,6 @@ import * as electron from 'electron';
 import * as fs from "node:fs";
 import path from "path";
 import { DownloadFileResult } from "./type";
-
 import { decode } from "iconv-lite";
 import sevenBin from "7zip-bin"; // 7z
 import { createExtractorFromFile } from "node-unrar-js/esm"; // rar
@@ -36,9 +35,6 @@ const logError = (...params: any[]) => {
   log.error(...params);
   console.error(...params);
 };
-
-// logInfo('agent', (global as any).GLOBAL_AGENT)
-// logInfo('process.env', process.env)
 
 
 const pathTo7zip = sevenBin.path7za;
