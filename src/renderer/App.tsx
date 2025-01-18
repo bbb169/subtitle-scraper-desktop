@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { stringify } from "qs";
-import SubtitleSiteRender from "./components/subtitleSiteRender";
+import SubtitleSiteRender from "./components/zimukuSubtitleSiteRender";
 import { Form, Input, message, Radio, Space } from "antd";
 import FileDragger from "./components/fileDragger";
 import { useRequest } from "ahooks";
