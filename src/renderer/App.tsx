@@ -8,7 +8,7 @@ import useFileInfoStore from "./store/fileInfo";
 import useUserSettingfoStore from "./store/userSetting";
 import Dragger from "antd/es/upload/Dragger";
 import { getEnumOptions } from "./utils";
-import { subtitleSourceEnum, subtitleSourceMap } from "./utils/constant";
+import { getSubtitleAddressMap, subtitleSourceEnum, subtitleSourceMap } from "./utils/constant";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { Search } = Input;
 
@@ -131,25 +131,20 @@ export default function () {
             buttonStyle="solid"
           />
         </Form.Item>
-        {subtitleSource === subtitleSourceEnum.zimuku ? (
+        {subtitleSource === subtitleSourceEnum.zimuku && (
           <>
             {mergedSearchValue && (
               <SubtitleSiteRender
-                src={`https://so.zimuku.org/search?${stringify({
-                  q: mergedSearchValue,
-                  chost: "zimuku.org",
-                })}`}
+                src={getSubtitleAddressMap[subtitleSourceEnum.zimuku](mergedSearchValue)}
               />
             )}
           </>
-        ) : (
+        )}
+        {subtitleSource === subtitleSourceEnum.tang && (
           <>
             {mergedSearchValue && (
               <SubtitleSiteRender
-                src={`https://so.zimuku.org/search?${stringify({
-                  q: mergedSearchValue,
-                  chost: "zimuku.org",
-                })}`}
+                src={getSubtitleAddressMap[subtitleSourceEnum.tang](mergedSearchValue)}
               />
             )}
           </>
