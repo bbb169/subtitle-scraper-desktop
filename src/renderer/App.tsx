@@ -37,12 +37,12 @@ export default function () {
     searchSubtitleSync(resolvedFileName);
   }, [resolvedFileName]);
 
-  const subtitleOptions = useMemo(() => getEnumOptions(subtitleSourceMap), [])
-  const subtitleSource = Form.useWatch('subtitleSource', form)
+  const subtitleOptions = useMemo(() => getEnumOptions(subtitleSourceMap), []);
+  const subtitleSource = Form.useWatch("subtitleSource", form);
 
   return (
     <Form form={form}>
-        <Space direction="vertical" style={{ width: "100%" }}>
+      <Space direction="vertical" style={{ width: "100%" }}>
         <Search
           placeholder="输入您要搜索的字幕"
           value={searchValue}
@@ -82,33 +82,39 @@ export default function () {
           label="直接下载字幕默认目录路径"
         >
           <Dragger
-              {...{
-                directory: true,
-                style: { position: 'relative' },
-              }}
-            >
-              <div style={{ width: '100%', height: '100%', position: 'absolute' }} onClick={(evt) => {
-                window.api.openDirectory().then(res => {
-                  if (!res.canceled) {
-                    const dirPath = res.filePaths[0];
+            {...{
+              directory: true,
+              style: { position: "relative" },
+            }}
+          >
+            <div
+              style={{ width: "100%", height: "100%", position: "absolute" }}
+              onClick={(evt) => {
+                window.api
+                  .openDirectory()
+                  .then((res) => {
+                    if (!res.canceled) {
+                      const dirPath = res.filePaths[0];
 
-                    setUserSettingfo({ defaultDownloadFolderPath: dirPath })
-                  }
-                }).catch(err => {
-                  message.error(`选择失败： ${JSON.stringify(err)}`)
-                })
-                evt.stopPropagation()
-              }}></div>
-              浏览或拖拽目录
-              当前默认路径：{defaultDownloadFolderPath}
-            </Dragger>
+                      setUserSettingfo({ defaultDownloadFolderPath: dirPath });
+                    }
+                  })
+                  .catch((err) => {
+                    message.error(`选择失败： ${JSON.stringify(err)}`);
+                  });
+                evt.stopPropagation();
+              }}
+            ></div>
+            浏览或拖拽目录 当前默认路径：{defaultDownloadFolderPath}
+          </Dragger>
         </Form.Item>
-        {fileDetailPageUrl && <Form.Item
-          key="subtitleDetailLink"
-          label="字幕详情页网址"
-        >
-          <a href={fileDetailPageUrl} target='_blank'>{fileDetailPageUrl}</a>
-        </Form.Item>}
+        {fileDetailPageUrl && (
+          <Form.Item key="subtitleDetailLink" label="字幕详情页网址">
+            <a href={fileDetailPageUrl} target="_blank">
+              {fileDetailPageUrl}
+            </a>
+          </Form.Item>
+        )}
         <Form.Item
           key="subtitleSource"
           label="字幕来源"
@@ -125,25 +131,29 @@ export default function () {
             buttonStyle="solid"
           />
         </Form.Item>
-        {subtitleSource === subtitleSourceEnum.zimuku ? <>
-          {mergedSearchValue && (
-          <SubtitleSiteRender
-            src={`https://so.zimuku.org/search?${stringify({
-              q: mergedSearchValue,
-              chost: "zimuku.org",
-            })}`}
-          />
+        {subtitleSource === subtitleSourceEnum.zimuku ? (
+          <>
+            {mergedSearchValue && (
+              <SubtitleSiteRender
+                src={`https://so.zimuku.org/search?${stringify({
+                  q: mergedSearchValue,
+                  chost: "zimuku.org",
+                })}`}
+              />
+            )}
+          </>
+        ) : (
+          <>
+            {mergedSearchValue && (
+              <SubtitleSiteRender
+                src={`https://so.zimuku.org/search?${stringify({
+                  q: mergedSearchValue,
+                  chost: "zimuku.org",
+                })}`}
+              />
+            )}
+          </>
         )}
-        </> : <>
-        {mergedSearchValue && (
-          <SubtitleSiteRender
-            src={`https://so.zimuku.org/search?${stringify({
-              q: mergedSearchValue,
-              chost: "zimuku.org",
-            })}`}
-          />
-        )}
-        </>}
       </Space>
     </Form>
   );
