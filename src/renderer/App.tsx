@@ -62,7 +62,7 @@ export default function () {
           enterButton
         />
         <FileDragger />
-        <Form.Item key="downloadToFolderDirectly" label="不询问直接下载字幕">
+        <Form.Item name="downloadToFolderDirectly" label="不询问直接下载字幕">
           <Radio.Group
             block
             options={[
@@ -109,14 +109,14 @@ export default function () {
           </Dragger>
         </Form.Item>
         {fileDetailPageUrl && (
-          <Form.Item key="subtitleDetailLink" label="字幕详情页网址">
+          <Form.Item name="subtitleDetailLink" label="字幕详情页网址">
             <a href={fileDetailPageUrl} target="_blank">
               {fileDetailPageUrl}
             </a>
           </Form.Item>
         )}
         <Form.Item
-          key="subtitleSource"
+          name="subtitleSource"
           label="字幕来源"
           initialValue={subtitleSourceEnum.zimuku}
         >

@@ -3,5 +3,5 @@ export const enum subtitleSourceEnum {
   tang = '98tang'
 }
 
-export const subtitleSourceMap = new Map([["字幕库",subtitleSourceEnum.zimuku ],
-  ["大堂",subtitleSourceEnum.tang ]])
+export const subtitleSourceMap = new Map([[subtitleSourceEnum.zimuku, "字幕库", ],
+  [subtitleSourceEnum.tang, "大堂", ]])
