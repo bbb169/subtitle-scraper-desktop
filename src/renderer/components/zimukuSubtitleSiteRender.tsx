@@ -9,59 +9,10 @@ import { recognize } from "tesseract.js";
 import useFileInfoStore from "../store/fileInfo";
 import { message } from "antd";
 import useUserSettingfoStore from "../store/userSetting";
+import { webviewExcuteJsPromiseWrapprer } from "../utils";
 
 const didFailLoadListener = (event: Event) => {
   console.error("Failed to load:", event);
-};
-
-const domNavigateing = (subtitleSiteDom: HTMLWebViewElement) => {
-  return new Promise<void>((resolve, reject) => {
-    let navigated = false;
-
-    const didiNavigateListener = () => {
-      console.log("did-navigate: ");
-
-      navigated = true;
-      subtitleSiteDom.removeEventListener("did-navigate", didiNavigateListener);
-      resolve();
-    };
-    subtitleSiteDom.addEventListener("did-navigate", didiNavigateListener);
-
-    setTimeout(() => {
-      if (!navigated) {
-        console.log("navigated: ", navigated);
-        reject();
-        subtitleSiteDom.removeEventListener(
-          "did-navigate",
-          didiNavigateListener
-        );
-      }
-    }, 2000);
-  });
-};
-
-const webviewExcuteJsPromiseWrapprer = <T,>(
-  originDom: HTMLWebViewElement,
-  funcPromise: Promise<T>
-) => {
-  return new Promise<T>((resolve, reject) => {
-    funcPromise.then((res) => {
-      domNavigateing(originDom)
-        .then(() => {
-          if (res) {
-            console.log('funcPromiseres: ', res);
-            resolve(res);
-          } else {
-            reject(new Error("未找到指定dom"));
-          }
-        })
-        .catch((err) => {
-          console.log('domNavigateing err: ', err);
-          console.log('domNavigateing res: ', res);
-          reject(err);
-        });
-    });
-  });
 };
 
 const verifyingCodeFunc = (subtitleSiteDom: HTMLWebViewElement) => {
