@@ -74,10 +74,6 @@ const subtitleDomExecuteJsMap = {
 // fetch({
 //   url: 'https://www.sehuatang.net/forum.php?mod=misc&action=attachpay&tid=427724&paysubmit=yes&infloat=yes&inajax=1',
 //   method: 'POST',
-// })
-// fetch({
-//   url: 'https://www.sehuatang.net/forum.php?mod=misc&action=attachpay&tid=427724&paysubmit=yes&infloat=yes&inajax=1',
-//   method: 'POST',
 //   formData: {
 
 //   },
