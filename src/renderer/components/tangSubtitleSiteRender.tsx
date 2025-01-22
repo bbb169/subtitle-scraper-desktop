@@ -71,12 +71,14 @@ const subtitleDomExecuteJsMap = {
     })
   },
 };
+// const formData = new FormData();
+// formData.append('key1', 'value1');
+// formData.append('key2', 'value2');
+
 // fetch({
 //   url: 'https://www.sehuatang.net/forum.php?mod=misc&action=attachpay&tid=427724&paysubmit=yes&infloat=yes&inajax=1',
 //   method: 'POST',
-//   formData: {
-
-//   },
+//   body: "Hello world",
 // })
 
 type SUBTITLE_DOM_STATUS = keyof typeof subtitleDomExecuteJsMap;
