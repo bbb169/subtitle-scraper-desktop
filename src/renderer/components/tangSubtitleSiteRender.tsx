@@ -28,23 +28,64 @@ const subtitleDomExecuteJsMap = {
     return new Promise<void>((resolve, reject) => {
       subtitleSiteDom.executeJavaScript(
         `
-          (function() {
+          new Promise((resolve, reject) => {
             const rarLink = document.querySelector('span[id*="attach"] > a');
             if (rarLink) {
-              if (!rarLink.href.includes('forum.php')) { // buyed
+              if (!rarLink.href.includes('forum.php')) { // buyed ============================
                 if (${downloadFileByRequest}) {
                   return rarLink.href
                 }
                 rarLink.click();
-                return rarLink.href
-              } else { // ready to buy
+                resolve(rarLink.href)
+              } else { // ready to buy ============================
                 rarLink.click();
-                return true
+                // 选择要观察的目标节点
+                const targetNode = document.getElementById('nv_forum');
+
+                let showPayModal = false;
+
+                // 监听购买弹窗是否出现
+                const modalObserver = new MutationObserver((mutationsList, observer) => {
+                  // 遍历每个变动记录
+                  for (const mutation of mutationsList) {
+                    if (mutation.type === 'childList' && mutation.target.id === 'fwin_attachpay') {
+                      showPayModal = true
+                      const payButton = document.querySelector('button[name*="paysubmit"]');
+                      payButton.click();
+
+                      // 监听新资源链接是否发生更新
+                      const newResourceObserver = new MutationObserver((newResourcMutationsList, newResourcObserver) => {
+                        // 遍历每个变动记录
+                        for (const mutation of mutationsList) {
+                          if (mutation.type === 'childList' && mutation.target.id === 'fwin_attachpay') {
+                            const newResourceObserver = 
+
+                          }
+                        }
+                      })
+
+                      resovle(true)
+                      observer.disconnect();
+                    }
+                  }
+                });
+
+                setTimeout(() => {
+                  if (!showPayModal) {
+                    reject(new Error('购买弹窗未显示'));
+                    modalObserver.disconnect();
+                  }
+                }, 1000);
+
+                // 开始观察
+                modalObserver.observe(targetNode, {
+                  childList: true, // 监听子节点的增删
+                });
               }
             } else {
-              return false;
+              reject(new Error('未找到字幕文件dom节点'));
             }
-          })();
+          })
         `
       ).then((res) => {
           if (res && res !== true) {
