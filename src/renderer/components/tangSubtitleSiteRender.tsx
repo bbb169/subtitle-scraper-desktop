@@ -57,9 +57,10 @@ const subtitleDomExecuteJsMap = {
                       const newResourceObserver = new MutationObserver((newResourcMutationsList, newResourcObserver) => {
                         // 遍历每个变动记录
                         for (const mutation of mutationsList) {
-                          if (mutation.type === 'childList' && mutation.target.id === 'fwin_attachpay') {
-                            const newResourceObserver = 
+                          if (mutation.type === 'childList' && mutation.target.className === 'attnm') {
+                            const resourceRarLink = document.querySelector('.attnm');
 
+                            resourceRarLink.click();
                           }
                         }
                       })
