@@ -114,9 +114,6 @@ const subtitleDomExecuteJsMap = {
   },
 };
 
-
-type SUBTITLE_DOM_STATUS = keyof typeof subtitleDomExecuteJsMap;
-
 export default forwardRef(function (
   props: IframeHTMLAttributes<any>,
 ) {
