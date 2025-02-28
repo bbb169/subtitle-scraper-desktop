@@ -5,6 +5,43 @@ import {
 } from "react";
 import { domNavigateing, webviewExcuteJsPromiseWrapprer } from "../utils";
 
+const getResourceObserver = ({
+  callbackStr,
+  rejectCallbackStr = "",
+  valueIndex = 0,
+}: {
+  callbackStr: string;
+  rejectCallbackStr: string;
+  valueIndex: number;
+}) => {
+  return `// 监听购买弹窗是否出现
+    let domChanged = false;
+    const modalObserver${valueIndex} = new MutationObserver((mutationsList, observer) => {
+      // 遍历每个变动记录
+      for (const mutation of mutationsList) {
+        if (mutation.type === 'childList') {
+          domChanged = true
+          ${callbackStr}
+
+          resovle(true)
+          observer.disconnect();
+        }
+      }
+    });
+
+    setTimeout(() => {
+      if (!domChanged) {
+        ${rejectCallbackStr}
+        modalObserver${valueIndex}.disconnect();
+      }
+    }, 1000);
+
+    // 开始观察
+    modalObserver${valueIndex}.observe(targetNode, {
+      childList: true, // 监听子节点的增删
+    });`;
+};
+
 const subtitleDomExecuteJsMap = {
   viewingSearchList: (subtitleSiteDom: HTMLWebViewElement) => {
     return webviewExcuteJsPromiseWrapprer(
