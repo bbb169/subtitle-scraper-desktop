@@ -1,8 +1,4 @@
-import {
-  forwardRef,
-  IframeHTMLAttributes,
-  useRef,
-} from "react";
+import { forwardRef, IframeHTMLAttributes, useRef } from "react";
 import { domNavigateing, webviewExcuteJsPromiseWrapprer } from "../utils";
 
 const getResourceObserver = ({
@@ -61,10 +57,14 @@ const subtitleDomExecuteJsMap = {
       )
     );
   },
-  viewingDetailPage: (subtitleSiteDom: HTMLWebViewElement, downloadFileByRequest = false) => {
+  viewingDetailPage: (
+    subtitleSiteDom: HTMLWebViewElement,
+    downloadFileByRequest = false
+  ) => {
     return new Promise<void>((resolve, reject) => {
-      subtitleSiteDom.executeJavaScript(
-        `
+      subtitleSiteDom
+        .executeJavaScript(
+          `
           new Promise((resolve, reject) => {
             const rarLink = document.querySelector('span[id*="attach"] > a');
             if (rarLink) {
@@ -125,35 +125,32 @@ const subtitleDomExecuteJsMap = {
             }
           })
         `
-      ).then((res) => {
+        )
+        .then((res) => {
           if (res && res !== true) {
             resolve(res);
           } else {
             domNavigateing(subtitleSiteDom)
               .then(() => {
                 if (res) {
-                  console.log('funcPromiseres: ', res);
+                  console.log("funcPromiseres: ", res);
                   resolve(res);
                 } else {
                   reject(new Error("未找到指定dom"));
                 }
               })
               .catch((err) => {
-                console.log('domNavigateing err: ', err);
-                console.log('domNavigateing res: ', res);
+                console.log("domNavigateing err: ", err);
+                console.log("domNavigateing res: ", res);
                 reject(err);
               });
           }
-
-            
-          });
-    })
+        });
+    });
   },
 };
 
-export default forwardRef(function (
-  props: IframeHTMLAttributes<any>,
-) {
+export default forwardRef(function (props: IframeHTMLAttributes<any>) {
   const subtitleSiteRef = useRef<HTMLWebViewElement>();
 
   return (
