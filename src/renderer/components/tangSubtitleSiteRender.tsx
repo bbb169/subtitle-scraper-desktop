@@ -1,5 +1,7 @@
-import { forwardRef, IframeHTMLAttributes, useRef } from "react";
+import { forwardRef, IframeHTMLAttributes, useRef, useState } from "react";
 import { domNavigateing, webviewExcuteJsPromiseWrapprer } from "../utils";
+import useFileInfoStore from "../store/fileInfo";
+import useUserSettingfoStore from "../store/userSetting";
 
 export const getResourceObserver = ({
   callbackStr,
@@ -130,8 +132,15 @@ const subtitleDomExecuteJsMap = {
   },
 };
 
+type SUBTITLE_DOM_STATUS = keyof typeof subtitleDomExecuteJsMap;
+
 export default forwardRef(function (props: IframeHTMLAttributes<any>) {
+  const { src } = props;
+  const { filePath, setFileInfo } = useFileInfoStore();
+  const { downloadToFolderDirectly, defaultDownloadFolderPath } = useUserSettingfoStore();
   const subtitleSiteRef = useRef<HTMLWebViewElement>();
+  const [subtitleDomStatus, setSubtitleDomStatus] =
+    useState<SUBTITLE_DOM_STATUS>();
 
   return (
     <>
