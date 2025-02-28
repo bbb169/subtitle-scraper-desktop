@@ -1,32 +1,32 @@
 import { forwardRef, IframeHTMLAttributes, useRef } from "react";
 import { domNavigateing, webviewExcuteJsPromiseWrapprer } from "../utils";
 
-const getResourceObserver = ({
+export const getResourceObserver = ({
   callbackStr,
   rejectCallbackStr = "",
   valueIndex = 0,
 }: {
   callbackStr: string;
-  rejectCallbackStr: string;
-  valueIndex: number;
+  rejectCallbackStr?: string;
+  valueIndex?: number;
 }) => {
   return `// 监听购买弹窗是否出现
-    let domChanged = false;
+    let domChanged${valueIndex} = false;
     const modalObserver${valueIndex} = new MutationObserver((mutationsList, observer) => {
       // 遍历每个变动记录
       for (const mutation of mutationsList) {
         if (mutation.type === 'childList') {
-          domChanged = true
+          domChanged${valueIndex} = true
           ${callbackStr}
 
-          resovle(true)
+          resolve(true)
           observer.disconnect();
         }
       }
     });
 
     setTimeout(() => {
-      if (!domChanged) {
+      if (!domChanged${valueIndex}) {
         ${rejectCallbackStr}
         modalObserver${valueIndex}.disconnect();
       }
@@ -81,44 +81,24 @@ const subtitleDomExecuteJsMap = {
 
                 let showPayModal = false;
 
-                // 监听购买弹窗是否出现
-                const modalObserver = new MutationObserver((mutationsList, observer) => {
-                  // 遍历每个变动记录
-                  for (const mutation of mutationsList) {
-                    if (mutation.type === 'childList' && mutation.target.id === 'fwin_attachpay') {
-                      showPayModal = true
-                      const payButton = document.querySelector('button[name*="paysubmit"]');
+                ${getResourceObserver({
+                  // get pay button and click =======================
+                  callbackStr: `const payButton = document.querySelector('button[name*="paysubmit"]');
                       payButton.click();
+                      ${getResourceObserver({
+                        // find resource link and click =======================
+                        callbackStr: `
+                        // 监听新资源链接是否发生更新
+                        const resourceRarLink = document.querySelector('.attnm');
 
-                      // 监听新资源链接是否发生更新
-                      const newResourceObserver = new MutationObserver((newResourcMutationsList, newResourcObserver) => {
-                        // 遍历每个变动记录
-                        for (const mutation of mutationsList) {
-                          if (mutation.type === 'childList' && mutation.target.className === 'attnm') {
-                            const resourceRarLink = document.querySelector('.attnm');
-
-                            resourceRarLink.click();
-                          }
-                        }
-                      })
-
-                      resovle(true)
-                      observer.disconnect();
-                    }
-                  }
-                });
-
-                setTimeout(() => {
-                  if (!showPayModal) {
-                    reject(new Error('购买弹窗未显示'));
-                    modalObserver.disconnect();
-                  }
-                }, 1000);
-
-                // 开始观察
-                modalObserver.observe(targetNode, {
-                  childList: true, // 监听子节点的增删
-                });
+                        resourceRarLink.click();
+                        `,
+                        rejectCallbackStr:  `reject(new Error('未找到资源链接'))`,
+                        valueIndex: 1
+                      })}
+                      `,
+                      rejectCallbackStr: `reject(new Error('购买弹窗未显示'))`,
+                })}
               }
             } else {
               reject(new Error('未找到字幕文件dom节点'));
