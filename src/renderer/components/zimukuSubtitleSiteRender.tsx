@@ -10,6 +10,7 @@ import useFileInfoStore from "../store/fileInfo";
 import { message } from "antd";
 import useUserSettingfoStore from "../store/userSetting";
 import { webviewExcuteJsPromiseWrapprer } from "../utils";
+import useDomStatusProcess from "./useDomStatusProcess";
 
 const didFailLoadListener = (event: Event) => {
   console.error("Failed to load:", event);
@@ -186,103 +187,26 @@ export default forwardRef(function (
 ) {
   const { src } = props;
   const { filePath, setFileInfo } = useFileInfoStore();
-  const { downloadToFolderDirectly, defaultDownloadFolderPath } = useUserSettingfoStore();
-  const subtitleSiteRef = useRef<HTMLWebViewElement>();
-  const [subtitleDomStatus, setSubtitleDomStatus] =
-    useState<SUBTITLE_DOM_STATUS>();
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  const subtitleSiteDomListenerRef = useRef(async () => {});
+  const { defaultDownloadFolderPath } = useUserSettingfoStore();
   const mergedFilePath = filePath || defaultDownloadFolderPath;
+  const { setSubtitleDomStatus, subtitleSiteRef } = useDomStatusProcess(subtitleDomExecuteJsMap, {
+    finnalDownloadPage: (res) => {
+      if (res?.length) {
+        console.log('res, filePath: ', res, mergedFilePath);
 
-  useEffect(() => {
-    if (!subtitleDomStatus) {
-      return;
-    }
-
-    const subtitleSiteDom = subtitleSiteRef.current;
-    let evtExcuted = false;
-
-    const removeAllListener = () => {
-      console.log("removed", subtitleDomStatus);
-
-      subtitleSiteDom.removeEventListener(
-        "dom-ready",
-        subtitleSiteDomListenerRef.current
-      );
-      subtitleSiteDom.removeEventListener("did-fail-load", didFailLoadListener);
-    };
-
-    subtitleSiteDomListenerRef.current = async () => {
-      console.log("subtitleDomStatus: ", subtitleDomStatus);
-      if (evtExcuted) {
-        return
+        window.api.downloadFile(res, mergedFilePath).then((res) => {
+          if (res.unziped) {
+            message.success(`字幕成功解压缩到${res.savePath}`)
+          } else {
+            message.success(`字幕成功写入${res.savePath}`)
+          }
+        }).catch(err => {
+          message.error(`字幕下载失败：${err}`)
+        })
       }
-      evtExcuted = true;
-      const appendArgs: any[] = [];
-
-      // `finnalDownloadPage` downloadFileByRequest = true
-      if (subtitleDomStatus === 'finnalDownloadPage' && (downloadToFolderDirectly && (mergedFilePath  || defaultDownloadFolderPath))) {
-        appendArgs.push(true)
-      }
-
-      subtitleDomExecuteJsMap[subtitleDomStatus](subtitleSiteRef.current, ...appendArgs)
-          .then((res) => {
-            console.log(`${subtitleDomStatus} res: `, res);
-
-            if (subtitleDomStatus === 'finnalDownloadPage' && res?.length) {
-              console.log('res, filePath: ', res, mergedFilePath);
-
-              window.api.downloadFile(res, mergedFilePath).then((res) => {
-                if (res.unziped) {
-                  message.success(`字幕成功解压缩到${res.savePath}`)
-                } else {
-                  message.success(`字幕成功写入${res.savePath}`)
-                }
-              }).catch(err => {
-                message.error(`字幕下载失败：${err}`)
-              })
-            } else if (subtitleDomStatus === 'viewingSearchList') {
-              setFileInfo({ fileDetailPageUrl: res })
-            }
-            const allStatus = Object.keys(
-              subtitleDomExecuteJsMap
-            ) as SUBTITLE_DOM_STATUS[];
-            const curStatusIndex = allStatus.findIndex(
-              (item) => item === subtitleDomStatus
-            );
-
-            const nextStatusIndex = curStatusIndex + 1;
-
-            if (nextStatusIndex >= allStatus.length) {
-              removeAllListener();
-              return;
-            }
-
-            const nextStatus = allStatus[nextStatusIndex];
-            console.log("nextStatus: ", nextStatus);
-            setSubtitleDomStatus(nextStatus);
-          })
-          .catch((err) => {
-            removeAllListener();
-            console.log(`${subtitleDomStatus} err: `, err);
-          });
-    };
-    subtitleSiteDom.addEventListener(
-      "dom-ready",
-      subtitleSiteDomListenerRef.current
-    );
-    subtitleSiteDom.addEventListener("did-fail-load", didFailLoadListener);
-
-    setTimeout(() => {
-      if (!evtExcuted) {
-        console.log(`${subtitleDomStatus} evtExcuted: `, evtExcuted);
-        subtitleSiteDomListenerRef.current();
-        evtExcuted = true;
-      }
-    }, 2000);
-
-    return removeAllListener;
-  }, [subtitleDomStatus]);
+    },
+    viewingSearchList: (res) => setFileInfo({ fileDetailPageUrl: res })
+  });
 
   useEffect(() => {
     setSubtitleDomStatus("verifyingCode");
