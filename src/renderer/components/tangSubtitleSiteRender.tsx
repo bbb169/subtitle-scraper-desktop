@@ -47,7 +47,7 @@ const subtitleDomExecuteJsMap = {
       subtitleSiteDom.executeJavaScript(
         `
           (function() {
-            const firstSubtitle = document.querySelector(".xs3");
+            const firstSubtitle = document.querySelector(".xs3 > a");
             if (firstSubtitle) {
               window.location.href = firstSubtitle.href;
               return firstSubtitle.href;
