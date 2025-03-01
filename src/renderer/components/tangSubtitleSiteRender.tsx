@@ -43,6 +43,25 @@ export const getResourceObserver = ({
 };
 
 const subtitleDomExecuteJsMap = {
+  searchPage: (subtitleSiteDom: HTMLWebViewElement, keyWord: string) => {
+    return webviewExcuteJsPromiseWrapprer(
+      subtitleSiteDom,
+      subtitleSiteDom.executeJavaScript(
+        `
+          (function() {
+            const input = document.querySelector("#scform_srchtxt");
+            const button = document.querySelector('#scform_submit');
+            if (input && button) {
+              input.value = '【自提】 ${keyWord}';
+              button.click();
+            } else {
+              return false;
+            }
+          })();
+        `
+      )
+    );
+  },
   viewingSearchList: (subtitleSiteDom: HTMLWebViewElement) => {
     return webviewExcuteJsPromiseWrapprer(
       subtitleSiteDom,
@@ -68,7 +87,7 @@ const subtitleDomExecuteJsMap = {
     return subtitleSiteDom.executeJavaScript(
       `
       new Promise((resolve, reject) => {
-        const rarLink = document.querySelector('span[id*="attach"] > a');
+        const rarLink = document.querySelector('.attnm > a');
         if (rarLink) {
           if (!rarLink.href.includes('forum.php')) { // buyed ============================
             if (${downloadFileByRequest}) {
@@ -145,7 +164,7 @@ export default forwardRef(function (props: IframeHTMLAttributes<any>) {
   );
 
   useEffect(() => {
-    setSubtitleDomStatus("viewingSearchList");
+    setSubtitleDomStatus('searchPage');
   }, [src]);
 
   return (

@@ -17,9 +17,5 @@ export const getSubtitleAddressMap = {
       chost: "zimuku.org",
     })}`,
   [subtitleSourceEnum.tang]: (value: string) =>
-    `https://www.sehuatang.net/search.php?mod=forum&searchid=0&searchmd5=5c95cc6125347931c90bed8fdcf1135e&orderby=lastpost&ascdesc=desc&searchsubmit=yes&${stringify(
-      {
-        kw: `【自提】 ${value}`,
-      }
-    )}`,
+    `https://www.sehuatang.net/search.php`,
 };
