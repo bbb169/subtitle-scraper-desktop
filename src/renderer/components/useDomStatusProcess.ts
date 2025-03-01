@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import useFileInfoStore from "../store/fileInfo";
 import useUserSettingfoStore from "../store/userSetting";
 
@@ -94,7 +94,7 @@ export default function <T extends Record<string, (subtitleSiteDom: HTMLWebViewE
   }, [subtitleDomStatus]);
 
   return {
-    setSubtitleDomStatus,
+    setSubtitleDomStatus: setSubtitleDomStatus as Dispatch<SetStateAction<keyof T>>,
     subtitleDomStatus: subtitleDomStatus as keyof T,
     subtitleSiteRef
   }
