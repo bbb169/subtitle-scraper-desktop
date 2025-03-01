@@ -8,6 +8,8 @@ import useUserSettingfoStore from "./store/userSetting";
 import Dragger from "antd/es/upload/Dragger";
 import { getEnumOptions } from "./utils";
 import { getSubtitleAddressMap, subtitleSourceEnum, subtitleSourceMap } from "./utils/constant";
+import TangSubtitleSiteRender from "./components/tangSubtitleSiteRender";
+import ZimukuSubtitleSiteRender from "./components/zimukuSubtitleSiteRender";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { Search } = Input;
 
@@ -133,7 +135,7 @@ export default function () {
         {subtitleSource === subtitleSourceEnum.zimuku && (
           <>
             {mergedSearchValue && (
-              <SubtitleSiteRender
+              <ZimukuSubtitleSiteRender
                 src={getSubtitleAddressMap[subtitleSourceEnum.zimuku](mergedSearchValue)}
               />
             )}
@@ -142,7 +144,7 @@ export default function () {
         {subtitleSource === subtitleSourceEnum.tang && (
           <>
             {mergedSearchValue && (
-              <SubtitleSiteRender
+              <TangSubtitleSiteRender
                 src={getSubtitleAddressMap[subtitleSourceEnum.tang](mergedSearchValue)}
               />
             )}
