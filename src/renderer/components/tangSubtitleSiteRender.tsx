@@ -1,7 +1,9 @@
-import { forwardRef, IframeHTMLAttributes, useRef, useState } from "react";
-import { domNavigateing, webviewExcuteJsPromiseWrapprer } from "../utils";
+import { forwardRef, IframeHTMLAttributes, useEffect } from "react";
+import { webviewExcuteJsPromiseWrapprer } from "../utils";
 import useFileInfoStore from "../store/fileInfo";
 import useUserSettingfoStore from "../store/userSetting";
+import useDomStatusProcess from "./useDomStatusProcess";
+import { message } from "antd";
 
 export const getResourceObserver = ({
   callbackStr,
@@ -63,84 +65,88 @@ const subtitleDomExecuteJsMap = {
     subtitleSiteDom: HTMLWebViewElement,
     downloadFileByRequest = false
   ) => {
-    return new Promise<void>((resolve, reject) => {
-      subtitleSiteDom
-        .executeJavaScript(
-          `
-          new Promise((resolve, reject) => {
-            const rarLink = document.querySelector('span[id*="attach"] > a');
-            if (rarLink) {
-              if (!rarLink.href.includes('forum.php')) { // buyed ============================
-                if (${downloadFileByRequest}) {
-                  return rarLink.href
-                }
-                rarLink.click();
-                resolve(rarLink.href)
-              } else { // ready to buy ============================
-                rarLink.click();
-                // 选择要观察的目标节点
-                const targetNode = document.getElementById('nv_forum');
-
-                let showPayModal = false;
-
-                ${getResourceObserver({
-                  // get pay button and click =======================
-                  callbackStr: `const payButton = document.querySelector('button[name*="paysubmit"]');
-                      payButton.click();
-                      ${getResourceObserver({
-                        // find resource link and click =======================
-                        callbackStr: `
-                        // 监听新资源链接是否发生更新
-                        const resourceRarLink = document.querySelector('.attnm');
-
-                        resourceRarLink.click();
-                        `,
-                        rejectCallbackStr:  `reject(new Error('未找到资源链接'))`,
-                        valueIndex: 1
-                      })}
-                      `,
-                      rejectCallbackStr: `reject(new Error('购买弹窗未显示'))`,
-                })}
-              }
-            } else {
-              reject(new Error('未找到字幕文件dom节点'));
+    return subtitleSiteDom.executeJavaScript(
+      `
+      new Promise((resolve, reject) => {
+        const rarLink = document.querySelector('span[id*="attach"] > a');
+        if (rarLink) {
+          if (!rarLink.href.includes('forum.php')) { // buyed ============================
+            if (${downloadFileByRequest}) {
+              return rarLink.href
             }
-          })
-        `
-        )
-        .then((res) => {
-          if (res && res !== true) {
-            resolve(res);
-          } else {
-            domNavigateing(subtitleSiteDom)
-              .then(() => {
-                if (res) {
-                  console.log("funcPromiseres: ", res);
-                  resolve(res);
-                } else {
-                  reject(new Error("未找到指定dom"));
-                }
-              })
-              .catch((err) => {
-                console.log("domNavigateing err: ", err);
-                console.log("domNavigateing res: ", res);
-                reject(err);
-              });
+            rarLink.click();
+            resolve(rarLink.href)
+          } else { // ready to buy ============================
+            rarLink.click();
+            // 选择要观察的目标节点
+            const targetNode = document.getElementById('nv_forum');
+
+            let showPayModal = false;
+
+            ${getResourceObserver({
+              // get pay button and click =======================
+              callbackStr: `const payButton = document.querySelector('button[name*="paysubmit"]');
+                  payButton.click();
+                  ${getResourceObserver({
+                    // find resource link and click =======================
+                    callbackStr: `
+                    // 监听新资源链接是否发生更新
+                    const resourceRarLink = document.querySelector('.attnm > a');
+
+                    if (${downloadFileByRequest}) {
+                      return resourceRarLink
+                    }
+                    resourceRarLink.click();
+                    `,
+                    rejectCallbackStr: `reject(new Error('未找到资源链接'))`,
+                    valueIndex: 1,
+                  })}
+                  `,
+              rejectCallbackStr: `reject(new Error('购买弹窗未显示'))`,
+            })}
           }
-        });
-    });
+        } else {
+          reject(new Error('未找到字幕文件dom节点'));
+        }
+      })
+    `
+    );
   },
 };
-
-type SUBTITLE_DOM_STATUS = keyof typeof subtitleDomExecuteJsMap;
 
 export default forwardRef(function (props: IframeHTMLAttributes<any>) {
   const { src } = props;
   const { filePath, setFileInfo } = useFileInfoStore();
-  const { downloadToFolderDirectly, defaultDownloadFolderPath } = useUserSettingfoStore();
-  const subtitleSiteRef = useRef<HTMLWebViewElement>();
-  const [subtitleDomStatus, setSubtitleDomStatus] =
-    useState<SUBTITLE_DOM_STATUS>();
+  const { defaultDownloadFolderPath } = useUserSettingfoStore();
+  const mergedFilePath = filePath || defaultDownloadFolderPath;
+  const { setSubtitleDomStatus, subtitleSiteRef } = useDomStatusProcess(
+    subtitleDomExecuteJsMap,
+    {
+      viewingDetailPage: (res) => {
+        if (res?.length) {
+          console.log("res, filePath: ", res, mergedFilePath);
+
+          window.api
+            .downloadFile(res, mergedFilePath)
+            .then((res) => {
+              if (res.unziped) {
+                message.success(`字幕成功解压缩到${res.savePath}`);
+              } else {
+                message.success(`字幕成功写入${res.savePath}`);
+              }
+            })
+            .catch((err) => {
+              message.error(`字幕下载失败：${err}`);
+            });
+        }
+      },
+      viewingSearchList: (res) => setFileInfo({ fileDetailPageUrl: res }),
+    }
+  );
+
+  useEffect(() => {
+    setSubtitleDomStatus("viewingSearchList");
+  }, [src]);
 
   return (
     <>
