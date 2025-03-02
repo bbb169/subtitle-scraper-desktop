@@ -16,6 +16,5 @@ export const getSubtitleAddressMap = {
       q: mergedSearchValue,
       chost: "zimuku.org",
     })}`,
-  [subtitleSourceEnum.tang]: (value: string) =>
-    `https://www.sehuatang.net/search.php`,
+  [subtitleSourceEnum.tang]: 'https://www.sehuatang.net/search.php',
 };

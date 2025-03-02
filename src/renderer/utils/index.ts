@@ -53,13 +53,40 @@ export const domNavigateing = (subtitleSiteDom: HTMLWebViewElement) => {
   });
 };
 
+export const domRedirected = (subtitleSiteDom: HTMLWebViewElement) => {
+  return new Promise<void>((resolve, reject) => {
+    let unloaded = false;
+
+    const didiNavigateListener = () => {
+      console.log("will-navigate: ");
+
+      unloaded = true;
+      subtitleSiteDom.removeEventListener("will-navigate", didiNavigateListener);
+      resolve();
+    };
+    subtitleSiteDom.addEventListener('will-navigate', didiNavigateListener);
+
+    setTimeout(() => {
+      if (!unloaded) {
+        console.log("will-navigate: ", unloaded);
+        reject();
+        subtitleSiteDom.removeEventListener(
+          "will-navigate",
+          didiNavigateListener
+        );
+      }
+    }, 2000);
+  });
+};
+
 export const webviewExcuteJsPromiseWrapprer = <T,>(
   originDom: HTMLWebViewElement,
-  funcPromise: Promise<T>
+  funcPromise: Promise<T>,
+  domListener = domNavigateing
 ) => {
   return new Promise<T>((resolve, reject) => {
     funcPromise.then((res) => {
-      domNavigateing(originDom)
+      domListener(originDom)
         .then(() => {
           if (res) {
             console.log('funcPromiseres: ', res);
@@ -76,3 +103,8 @@ export const webviewExcuteJsPromiseWrapprer = <T,>(
     });
   });
 };
+
+export const webviewExcuteJsRedirectPromiseWrapprer = <T,>(
+  originDom: HTMLWebViewElement,
+  funcPromise: Promise<T>
+) => webviewExcuteJsPromiseWrapprer<T>(originDom, funcPromise, domRedirected);
