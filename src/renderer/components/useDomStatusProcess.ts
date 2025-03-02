@@ -6,7 +6,7 @@ const didFailLoadListener = (event: Event) => {
   console.error("Failed to load:", event);
 };
 
-export default function <T extends Record<string, (subtitleSiteDom: HTMLWebViewElement, ...args: any) => Promise<any>>>(subtitleDomExecuteJsMap: T, evtCallback?: Partial<Record<keyof T, (result: any) => void>>) {
+export default function <T extends Record<string, (subtitleSiteDom: HTMLWebViewElement, ...args: any) => Promise<any>>>(subtitleDomExecuteJsMap: T, evtCallback?: Partial<Record<keyof T, (result: any) => void>>, appendArgsMap?: Partial<Record<keyof T, any[]>>) {
   const { filePath } = useFileInfoStore();
   const { downloadToFolderDirectly, defaultDownloadFolderPath } = useUserSettingfoStore();
   const subtitleSiteRef = useRef<HTMLWebViewElement>();
@@ -47,7 +47,10 @@ export default function <T extends Record<string, (subtitleSiteDom: HTMLWebViewE
         appendArgs.push(true)
       }
 
-      subtitleDomExecuteJsMap[subtitleDomStatus](subtitleSiteRef.current, ...appendArgs)
+      // add more args from appendArgsMap ===================
+      const curAppendArgs = appendArgsMap[subtitleDomStatus] || [];
+
+      subtitleDomExecuteJsMap[subtitleDomStatus](subtitleSiteRef.current, ...appendArgs, ...curAppendArgs)
           .then((res) => {
             console.log(`${subtitleDomStatus} res: `, res);
 
