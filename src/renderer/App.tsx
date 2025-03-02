@@ -145,7 +145,8 @@ export default function () {
           <>
             {mergedSearchValue && (
               <TangSubtitleSiteRender
-                src={getSubtitleAddressMap[subtitleSourceEnum.tang](mergedSearchValue)}
+                src={getSubtitleAddressMap[subtitleSourceEnum.tang]}
+                keyWord={mergedSearchValue}
               />
             )}
           </>

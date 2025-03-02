@@ -1,5 +1,5 @@
-import { forwardRef, IframeHTMLAttributes, useEffect } from "react";
-import { webviewExcuteJsPromiseWrapprer } from "../utils";
+import { IframeHTMLAttributes, useEffect } from "react";
+import { webviewExcuteJsPromiseWrapprer, webviewExcuteJsRedirectPromiseWrapprer } from "../utils";
 import useFileInfoStore from "../store/fileInfo";
 import useUserSettingfoStore from "../store/userSetting";
 import useDomStatusProcess from "./useDomStatusProcess";
@@ -44,7 +44,7 @@ export const getResourceObserver = ({
 
 const subtitleDomExecuteJsMap = {
   searchPage: (subtitleSiteDom: HTMLWebViewElement, keyWord: string) => {
-    return webviewExcuteJsPromiseWrapprer(
+    return webviewExcuteJsRedirectPromiseWrapprer(
       subtitleSiteDom,
       subtitleSiteDom.executeJavaScript(
         `
@@ -54,6 +54,7 @@ const subtitleDomExecuteJsMap = {
             if (input && button) {
               input.value = '【自提】 ${keyWord}';
               button.click();
+              return input.value
             } else {
               return false;
             }
@@ -113,7 +114,7 @@ const subtitleDomExecuteJsMap = {
                     const resourceRarLink = document.querySelector('.attnm > a');
 
                     if (${downloadFileByRequest}) {
-                      return resourceRarLink
+                      resolve(resourceRarLink)
                     }
                     resourceRarLink.click();
                     `,
@@ -133,7 +134,10 @@ const subtitleDomExecuteJsMap = {
   },
 };
 
-export default forwardRef(function (props: IframeHTMLAttributes<any>) {
+export default function ({
+  keyWord,
+  ...props
+}: IframeHTMLAttributes<any> & { keyWord: string }) {
   const { src } = props;
   const { filePath, setFileInfo } = useFileInfoStore();
   const { defaultDownloadFolderPath } = useUserSettingfoStore();
@@ -160,11 +164,14 @@ export default forwardRef(function (props: IframeHTMLAttributes<any>) {
         }
       },
       viewingSearchList: (res) => setFileInfo({ fileDetailPageUrl: res }),
+    },
+    {
+      searchPage: [keyWord],
     }
   );
 
   useEffect(() => {
-    setSubtitleDomStatus('searchPage');
+    setSubtitleDomStatus("searchPage");
   }, [src]);
 
   return (
@@ -178,4 +185,4 @@ export default forwardRef(function (props: IframeHTMLAttributes<any>) {
       ></webview>
     </>
   );
-});
+}
