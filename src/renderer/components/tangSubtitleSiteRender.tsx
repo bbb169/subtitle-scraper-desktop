@@ -93,9 +93,9 @@ const subtitleDomExecuteJsMap = {
         if (rarLink) {
           if (!rarLink.href.includes('forum.php')) { // buyed ============================
             if (${downloadFileByRequest}) {
-              return rarLink.href
+              return resolve(rarLink.href)
             }
-            rarLink.click();
+            window.location.href = rarLink.href;
             resolve(rarLink.href)
           } else { // ready to buy ============================
             rarLink.click();
@@ -116,8 +116,9 @@ const subtitleDomExecuteJsMap = {
 
                     if (${downloadFileByRequest}) {
                       resolve(resourceRarLink)
+                      return
                     }
-                    resourceRarLink.click();
+                    window.location.href = resourceRarLink.href;
                     `,
                     rejectCallbackStr: `reject(new Error('未找到资源链接'))`,
                     valueIndex: 1,
