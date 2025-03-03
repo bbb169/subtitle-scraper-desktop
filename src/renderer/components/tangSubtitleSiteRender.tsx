@@ -88,7 +88,8 @@ const subtitleDomExecuteJsMap = {
     return subtitleSiteDom.executeJavaScript(
       `
       new Promise((resolve, reject) => {
-        const rarLink = document.querySelector('.attnm > a');
+        const ops = document.querySelectorAll('[id*=post] ignore_js_op'); 
+        const rarLink = ops[ops.length - 1].querySelector('a');
         if (rarLink) {
           if (!rarLink.href.includes('forum.php')) { // buyed ============================
             if (${downloadFileByRequest}) {
