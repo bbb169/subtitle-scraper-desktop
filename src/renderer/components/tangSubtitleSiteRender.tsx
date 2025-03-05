@@ -169,10 +169,11 @@ export default function ({
     },
     {
       searchPage: [keyWord],
+      viewingDetailPage: [downloadToFolderDirectly]
     }
   );
 
-  useEffect(() => {
+  useRequest(async () => {
     setSubtitleDomStatus("searchPage");
   }, [src]);
 
