@@ -23,7 +23,6 @@ export const getResourceObserver = ({
           domChanged${valueIndex} = true
           ${callbackStr}
 
-          resolve(true)
           observer.disconnect();
         }
       }
@@ -39,6 +38,7 @@ export const getResourceObserver = ({
     // 开始观察
     modalObserver${valueIndex}.observe(targetNode, {
       childList: true, // 监听子节点的增删
+      subtree: true
     });`;
 };
 
@@ -96,7 +96,7 @@ const subtitleDomExecuteJsMap = {
               return resolve(rarLink.href)
             }
             window.location.href = rarLink.href;
-            resolve(rarLink.href)
+            resolve(true)
           } else { // ready to buy ============================
             rarLink.click();
             // 选择要观察的目标节点
@@ -112,13 +112,14 @@ const subtitleDomExecuteJsMap = {
                     // find resource link and click =======================
                     callbackStr: `
                     // 监听新资源链接是否发生更新
-                    const resourceRarLink = document.querySelector('.attnm > a');
+                    ${getResourceLink(1)}
 
                     if (${downloadFileByRequest}) {
-                      resolve(resourceRarLink)
+                      resolve(resourceRarLink${1}.href)
                       return
                     }
-                    window.location.href = resourceRarLink.href;
+                    window.location.href = resourceRarLink${1}.href;
+                    resolve(true)
                     `,
                     rejectCallbackStr: `reject(new Error('未找到资源链接'))`,
                     valueIndex: 1,
