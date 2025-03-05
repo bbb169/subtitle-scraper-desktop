@@ -175,7 +175,10 @@ export default function ({
 
   useRequest(async () => {
     setSubtitleDomStatus("searchPage");
-  }, [src]);
+  }, { 
+    refreshDeps: [src, downloadToFolderDirectly, defaultDownloadFolderPath],
+    debounceWait: 500,
+  })
 
   return (
     <>
