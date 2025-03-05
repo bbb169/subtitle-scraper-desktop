@@ -4,6 +4,7 @@ import useFileInfoStore from "../store/fileInfo";
 import useUserSettingfoStore from "../store/userSetting";
 import useDomStatusProcess from "./useDomStatusProcess";
 import { message } from "antd";
+import { useRequest } from "ahooks";
 
 export const getResourceObserver = ({
   callbackStr,
@@ -41,6 +42,11 @@ export const getResourceObserver = ({
       subtree: true
     });`;
 };
+
+export const getResourceLink = (index = 0) => `
+const ops${index} = document.querySelectorAll('[id*=post] ignore_js_op'); 
+const resourceLink${index} = ops${index}[ops${index}.length - 1].querySelector('a');
+`
 
 const subtitleDomExecuteJsMap = {
   searchPage: (subtitleSiteDom: HTMLWebViewElement, keyWord: string) => {
@@ -143,7 +149,7 @@ export default function ({
 }: IframeHTMLAttributes<any> & { keyWord: string }) {
   const { src } = props;
   const { filePath, setFileInfo } = useFileInfoStore();
-  const { defaultDownloadFolderPath } = useUserSettingfoStore();
+  const { defaultDownloadFolderPath, downloadToFolderDirectly } = useUserSettingfoStore();
   const mergedFilePath = filePath || defaultDownloadFolderPath;
   const { setSubtitleDomStatus, subtitleSiteRef } = useDomStatusProcess(
     subtitleDomExecuteJsMap,
