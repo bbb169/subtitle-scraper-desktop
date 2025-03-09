@@ -176,16 +176,19 @@ export default function ({
     },
     {
       searchPage: [keyWord],
-      viewingDetailPage: [downloadToFolderDirectly]
+      viewingDetailPage: [downloadToFolderDirectly],
     }
   );
 
-  useRequest(async () => {
-    setSubtitleDomStatus("searchPage");
-  }, { 
-    refreshDeps: [src, downloadToFolderDirectly, defaultDownloadFolderPath],
-    debounceWait: 500,
-  })
+  useRequest(
+    async () => {
+      setSubtitleDomStatus("searchPage");
+    },
+    {
+      refreshDeps: [src, downloadToFolderDirectly, defaultDownloadFolderPath, keyWord],
+      debounceWait: 500,
+    }
+  );
 
   return (
     <>
