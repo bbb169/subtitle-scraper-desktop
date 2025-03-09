@@ -133,7 +133,7 @@ const createWindow = async () => {
       allowRunningInsecureContent: true,
       webviewTag: true, // 启用 webview
     },
-    autoHideMenuBar: true,
+    // autoHideMenuBar: true,
   });
 
   // and load the index.html of the app.

@@ -54,8 +54,9 @@ export default function <T extends Record<string, (subtitleSiteDom: HTMLWebViewE
           .then((res) => {
             console.log(`${subtitleDomStatus} res: `, res);
 
-            evtCallback?.[subtitleDomStatus]?.(res);
+            evtCallback?.[subtitleDomStatus]?.(res); // 调用当前页面的回调
 
+            // 流转下一个页面 =========================
             const allStatus = Object.keys(
               subtitleDomExecuteJsMap
             ) as string[];
