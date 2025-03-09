@@ -1,5 +1,8 @@
 import { IframeHTMLAttributes, useEffect } from "react";
-import { webviewExcuteJsPromiseWrapprer, webviewExcuteJsRedirectPromiseWrapprer } from "../utils";
+import {
+  webviewExcuteJsPromiseWrapprer,
+  webviewExcuteJsRedirectPromiseWrapprer,
+} from "../utils";
 import useFileInfoStore from "../store/fileInfo";
 import useUserSettingfoStore from "../store/userSetting";
 import useDomStatusProcess from "./useDomStatusProcess";
@@ -46,7 +49,7 @@ export const getResourceObserver = ({
 export const getResourceLink = (index = 0) => `
 const ops${index} = document.querySelectorAll('[id*=post] ignore_js_op'); 
 const resourceLink${index} = ops${index}[ops${index}.length - 1].querySelector('a');
-`
+`;
 
 const subtitleDomExecuteJsMap = {
   searchPage: (subtitleSiteDom: HTMLWebViewElement, keyWord: string) => {
@@ -91,55 +94,60 @@ const subtitleDomExecuteJsMap = {
     subtitleSiteDom: HTMLWebViewElement,
     downloadFileByRequest = false
   ) => {
-    return subtitleSiteDom.executeJavaScript(
-      `
+    const excuteStr = `
       new Promise((resolve, reject) => {
-        const ops = document.querySelectorAll('[id*=post] ignore_js_op'); 
-        const rarLink = ops[ops.length - 1].querySelector('a');
-        if (rarLink) {
-          if (!rarLink.href.includes('forum.php')) { // buyed ============================
-            if (${downloadFileByRequest}) {
-              return resolve(rarLink.href)
-            }
-            window.location.href = rarLink.href;
-            resolve(true)
-          } else { // ready to buy ============================
-            rarLink.click();
-            // 选择要观察的目标节点
-            const targetNode = document.getElementById('nv_forum');
+        try {
+          const ops = document.querySelectorAll('[id*=post] ignore_js_op'); 
+          const rarLink = ops[ops.length - 1].querySelector('a');
+          if (rarLink) {
+            if (!rarLink.href.includes('forum.php')) { // buyed ============================
+              if (${downloadFileByRequest}) {
+                return resolve(rarLink.href)
+              }
+              window.location.href = rarLink.href;
+              resolve(true)
+            } else { // ready to buy ============================
+              rarLink.click();
+              // 选择要观察的目标节点
+              const targetNode = document.getElementById('nv_forum');
 
-            let showPayModal = false;
+              let showPayModal = false;
 
-            ${getResourceObserver({
-              // get pay button and click =======================
-              callbackStr: `const payButton = document.querySelector('button[name*="paysubmit"]');
-                  payButton.click();
-                  ${getResourceObserver({
-                    // find resource link and click =======================
-                    callbackStr: `
-                    // 监听新资源链接是否发生更新
-                    ${getResourceLink(1)}
+              ${getResourceObserver({
+                // get pay button and click =======================
+                callbackStr: `const payButton = document.querySelector('button[name*="paysubmit"]');
+                    payButton.click();
+                    ${getResourceObserver({
+                      // find resource link and click =======================
+                      callbackStr: `
+                      // 监听新资源链接是否发生更新
+                      ${getResourceLink(1)}
 
-                    if (${downloadFileByRequest}) {
-                      resolve(resourceRarLink${1}.href)
-                      return
-                    }
-                    window.location.href = resourceRarLink${1}.href;
-                    resolve(true)
+                      if (${downloadFileByRequest}) {
+                        resolve(resourceRarLink${1}.href)
+                        return
+                      }
+                      window.location.href = resourceRarLink${1}.href;
+                      resolve(true)
+                      `,
+                      rejectCallbackStr: `reject(new Error('未找到资源链接'))`,
+                      valueIndex: 1,
+                    })}
                     `,
-                    rejectCallbackStr: `reject(new Error('未找到资源链接'))`,
-                    valueIndex: 1,
-                  })}
-                  `,
-              rejectCallbackStr: `reject(new Error('购买弹窗未显示'))`,
-            })}
+                rejectCallbackStr: `reject(new Error('购买弹窗未显示'))`,
+              })}
+            }
+          } else {
+            reject(new Error('未找到字幕文件dom节点'));
           }
-        } else {
-          reject(new Error('未找到字幕文件dom节点'));
+        } catch (error) {
+          reject(error);
         }
       })
-    `
-    );
+    `;
+
+    console.log("excuteStr", excuteStr);
+    return subtitleSiteDom.executeJavaScript(excuteStr);
   },
 };
 
@@ -149,7 +157,8 @@ export default function ({
 }: IframeHTMLAttributes<any> & { keyWord: string }) {
   const { src } = props;
   const { filePath, setFileInfo } = useFileInfoStore();
-  const { defaultDownloadFolderPath, downloadToFolderDirectly } = useUserSettingfoStore();
+  const { defaultDownloadFolderPath, downloadToFolderDirectly } =
+    useUserSettingfoStore();
   const mergedFilePath = filePath || defaultDownloadFolderPath;
   const { setSubtitleDomStatus, subtitleSiteRef } = useDomStatusProcess(
     subtitleDomExecuteJsMap,
