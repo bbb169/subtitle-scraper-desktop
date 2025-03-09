@@ -111,8 +111,6 @@ const subtitleDomExecuteJsMap = {
               // 选择要观察的目标节点
               const targetNode = document.getElementById('nv_forum');
 
-              let showPayModal = false;
-
               ${getResourceObserver({
                 // get pay button and click =======================
                 callbackStr: `const payButton = document.querySelector('button[name*="paysubmit"]');
