@@ -1,4 +1,4 @@
-import { IframeHTMLAttributes, useEffect } from "react";
+import { IframeHTMLAttributes, useEffect, useMemo } from "react";
 import {
   webviewExcuteJsPromiseWrapprer,
   webviewExcuteJsRedirectPromiseWrapprer,
@@ -6,7 +6,7 @@ import {
 import useFileInfoStore from "../store/fileInfo";
 import useUserSettingfoStore from "../store/userSetting";
 import useDomStatusProcess from "./useDomStatusProcess";
-import { message } from "antd";
+import { message, Space } from "antd";
 import { useRequest } from "ahooks";
 
 export const getResourceObserver = ({
@@ -158,7 +158,7 @@ export default function ({
   const { defaultDownloadFolderPath, downloadToFolderDirectly } =
     useUserSettingfoStore();
   const mergedFilePath = filePath || defaultDownloadFolderPath;
-  const { setSubtitleDomStatus, subtitleSiteRef } = useDomStatusProcess(
+  const { setSubtitleDomStatus, subtitleSiteRef, domError } = useDomStatusProcess(
     subtitleDomExecuteJsMap,
     {
       viewingDetailPage: (res) => {
@@ -194,18 +194,27 @@ export default function ({
     {
       refreshDeps: [src, downloadToFolderDirectly, defaultDownloadFolderPath, keyWord],
       debounceWait: 500,
+      debounceLeading: false,
     }
   );
 
+  const errorDisplayer = useMemo(() => {
+    console.log('domError: ', domError);
+
+    return <div key='error' style={{ wordBreak: 'break-word' }}>{JSON.stringify(domError)}</div>
+  }, [domError]);
+
   return (
-    <>
+    <Space direction='vertical' style={{ width: '100%' }} styles={{ item: { width: '100%' } }}>
+      {errorDisplayer}
       <webview
+        key='webview'
         webpreferences="contextIsolation=no, nodeIntegration=yes"
         frameBorder="0"
         style={{ width: "100%", height: 800 }}
         {...props}
         ref={subtitleSiteRef}
       ></webview>
-    </>
+    </Space>
   );
 }
