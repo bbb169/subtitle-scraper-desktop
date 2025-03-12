@@ -15,6 +15,7 @@ export default function <T extends Record<string, (subtitleSiteDom: HTMLWebViewE
   const mergedFilePath = filePath || defaultDownloadFolderPath;
 
   const [domError, setDomError] = useState<Event | undefined>();
+  const [loading, setLoading] = useState<boolean>();
 
   const didFailLoadListener = useCallback((event: Event) => {
     subtitleSiteRef.current.removeEventListener(
@@ -23,6 +24,7 @@ export default function <T extends Record<string, (subtitleSiteDom: HTMLWebViewE
     );
     console.error("Failed to load:", event);
     setDomError(event)
+    setLoading(false)
   }, []);
 
 
@@ -43,6 +45,7 @@ export default function <T extends Record<string, (subtitleSiteDom: HTMLWebViewE
     );
 
     if (curStatusIndex === 0) {
+      setLoading(true)
       setDomError(undefined);
     }
 
@@ -61,6 +64,8 @@ export default function <T extends Record<string, (subtitleSiteDom: HTMLWebViewE
       if (evtExcuted) {
         return
       }
+
+      setLoading(true)
       evtExcuted = true;
       const appendArgs: any[] = [];
 
@@ -95,6 +100,7 @@ export default function <T extends Record<string, (subtitleSiteDom: HTMLWebViewE
             console.log(`${subtitleDomStatus} err: `, err);
             if (err) {
               setDomError(err);
+              setLoading(false)
             }
           });
     };
@@ -119,6 +125,7 @@ export default function <T extends Record<string, (subtitleSiteDom: HTMLWebViewE
     setSubtitleDomStatus: setSubtitleDomStatus as Dispatch<SetStateAction<keyof T>>,
     subtitleDomStatus: subtitleDomStatus as keyof T,
     subtitleSiteRef,
-    domError
+    domError,
+    loading
   }
 }

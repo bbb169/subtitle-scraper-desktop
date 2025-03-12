@@ -6,7 +6,7 @@ import {
 import useFileInfoStore from "../store/fileInfo";
 import useUserSettingfoStore from "../store/userSetting";
 import useDomStatusProcess from "./useDomStatusProcess";
-import { message, Space } from "antd";
+import { message, Skeleton, Space } from "antd";
 import { useRequest } from "ahooks";
 
 export const getResourceObserver = ({
@@ -158,7 +158,7 @@ export default function ({
   const { defaultDownloadFolderPath, downloadToFolderDirectly } =
     useUserSettingfoStore();
   const mergedFilePath = filePath || defaultDownloadFolderPath;
-  const { setSubtitleDomStatus, subtitleSiteRef, domError } = useDomStatusProcess(
+  const { setSubtitleDomStatus, subtitleSiteRef, domError, loading } = useDomStatusProcess(
     subtitleDomExecuteJsMap,
     {
       viewingDetailPage: (res) => {
@@ -206,6 +206,7 @@ export default function ({
 
   return (
     <Space direction='vertical' style={{ width: '100%' }} styles={{ item: { width: '100%' } }}>
+      {loading && <Skeleton active />}
       {errorDisplayer}
       <webview
         key='webview'
