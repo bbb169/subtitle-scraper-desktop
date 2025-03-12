@@ -1,10 +1,8 @@
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useCallback, useEffect, useRef, useState } from "react";
 import useFileInfoStore from "../store/fileInfo";
 import useUserSettingfoStore from "../store/userSetting";
 
-const didFailLoadListener = (event: Event) => {
-  console.error("Failed to load:", event);
-};
+
 
 export default function <T extends Record<string, (subtitleSiteDom: HTMLWebViewElement, ...args: any) => Promise<any>>>(subtitleDomExecuteJsMap: T, evtCallback?: Partial<Record<keyof T, (result: any) => void>>, appendArgsMap?: Partial<Record<keyof T, any[]>>) {
   const { filePath } = useFileInfoStore();
@@ -16,6 +14,18 @@ export default function <T extends Record<string, (subtitleSiteDom: HTMLWebViewE
   const subtitleSiteDomListenerRef = useRef(async () => {});
   const mergedFilePath = filePath || defaultDownloadFolderPath;
 
+  const [domError, setDomError] = useState<Event | undefined>();
+
+  const didFailLoadListener = useCallback((event: Event) => {
+    subtitleSiteRef.current.removeEventListener(
+      "dom-ready",
+      subtitleSiteDomListenerRef.current
+    );
+    console.error("Failed to load:", event);
+    setDomError(event)
+  }, []);
+
+
   useEffect(() => {
     if (!subtitleDomStatus) {
       return;
@@ -23,6 +33,18 @@ export default function <T extends Record<string, (subtitleSiteDom: HTMLWebViewE
 
     const subtitleSiteDom = subtitleSiteRef.current;
     let evtExcuted = false;
+
+    // get currentIndex =============
+    const allStatus = Object.keys(
+      subtitleDomExecuteJsMap
+    ) as string[];
+    const curStatusIndex = allStatus.findIndex(
+      (item) => item === subtitleDomStatus
+    );
+
+    if (curStatusIndex === 0) {
+      setDomError(undefined);
+    }
 
     const removeAllListener = () => {
       console.log("removed", subtitleDomStatus);
@@ -57,13 +79,6 @@ export default function <T extends Record<string, (subtitleSiteDom: HTMLWebViewE
             evtCallback?.[subtitleDomStatus]?.(res); // 调用当前页面的回调
 
             // 流转下一个页面 =========================
-            const allStatus = Object.keys(
-              subtitleDomExecuteJsMap
-            ) as string[];
-            const curStatusIndex = allStatus.findIndex(
-              (item) => item === subtitleDomStatus
-            );
-
             const nextStatusIndex = curStatusIndex + 1;
 
             if (nextStatusIndex >= allStatus.length) {
@@ -78,6 +93,9 @@ export default function <T extends Record<string, (subtitleSiteDom: HTMLWebViewE
           .catch((err) => {
             removeAllListener();
             console.log(`${subtitleDomStatus} err: `, err);
+            if (err) {
+              setDomError(err);
+            }
           });
     };
     subtitleSiteDom.addEventListener(
@@ -100,6 +118,7 @@ export default function <T extends Record<string, (subtitleSiteDom: HTMLWebViewE
   return {
     setSubtitleDomStatus: setSubtitleDomStatus as Dispatch<SetStateAction<keyof T>>,
     subtitleDomStatus: subtitleDomStatus as keyof T,
-    subtitleSiteRef
+    subtitleSiteRef,
+    domError
   }
 }
