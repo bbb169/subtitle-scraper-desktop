@@ -1,9 +1,6 @@
 import {
-  forwardRef,
   IframeHTMLAttributes,
   useEffect,
-  useRef,
-  useState,
 } from "react";
 import { recognize } from "tesseract.js";
 import useFileInfoStore from "../store/fileInfo";
@@ -12,9 +9,6 @@ import useUserSettingfoStore from "../store/userSetting";
 import { webviewExcuteJsPromiseWrapprer } from "../utils";
 import useDomStatusProcess from "./useDomStatusProcess";
 
-const didFailLoadListener = (event: Event) => {
-  console.error("Failed to load:", event);
-};
 
 const verifyingCodeFunc = (subtitleSiteDom: HTMLWebViewElement) => {
   return new Promise<void>((resolve, reject) => {
@@ -180,9 +174,8 @@ const subtitleDomExecuteJsMap = {
   },
 };
 
-type SUBTITLE_DOM_STATUS = keyof typeof subtitleDomExecuteJsMap;
 
-export default forwardRef(function (
+export default function (
   props: IframeHTMLAttributes<any>,
 ) {
   const { src } = props;
@@ -223,4 +216,4 @@ export default forwardRef(function (
       ></webview>
     </>
   );
-});
+}
