@@ -122,10 +122,10 @@ const subtitleDomExecuteJsMap = {
                       ${getResourceLink(1)}
 
                       if (${downloadFileByRequest}) {
-                        resolve(resourceRarLink${1}.href)
+                        resolve(resourceLink${1}.href)
                         return
                       }
-                      window.location.href = resourceRarLink${1}.href;
+                      window.location.href = resourceLink${1}.href;
                       resolve(true)
                       `,
                       rejectCallbackStr: `reject(new Error('未找到资源链接'))`,
