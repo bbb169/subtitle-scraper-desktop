@@ -65,7 +65,7 @@ export default function <T extends Record<string, (subtitleSiteDom: HTMLWebViewE
         return
       }
 
-      setLoading(true)
+      setLoading(false)
       evtExcuted = true;
       const appendArgs: any[] = [];
 
