@@ -75,7 +75,7 @@ export default function <T extends Record<string, (subtitleSiteDom: HTMLWebViewE
       }
 
       // add more args from appendArgsMap ===================
-      const curAppendArgs = appendArgsMap[subtitleDomStatus] || [];
+      const curAppendArgs = appendArgsMap?.[subtitleDomStatus] || [];
 
       subtitleDomExecuteJsMap[subtitleDomStatus](subtitleSiteRef.current, ...appendArgs, ...curAppendArgs)
           .then((res) => {
